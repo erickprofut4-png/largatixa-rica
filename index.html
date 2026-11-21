@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LARGATIXA RICA — Arcade Recreativo</title>
+  <style>
+    :root {
+      --bg: #050505;
+      --card: #0f0f0f;
+      --card-2: #161616;
+      --neon: #39ff14;
+      --neon-dim: rgba(57, 255, 20, 0.16);
+      --text: #f3f3f3;
+      --muted: #9aa09a;
+      --danger: #ff4d4d;
+    }
+
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #1e1e1e;
+      background: #080808;
+    }
+
+    .brand {
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: var(--neon);
+      text-shadow: 0 0 12px rgba(57, 255, 20, 0.45);
+    }
+
+    .badge {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      background: var(--neon-dim);
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid #222;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    h2, h3 {
+      margin-top: 0;
+      color: var(--neon);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 16px;
+    }
+
+    .grid-games {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 10px;
+    }
+
+    input, select, button {
+      font-size: 1rem;
+      border-radius: 10px;
+      padding: 11px 14px;
+      border: 1px solid #2c2c2c;
+      background: var(--card-2);
+      color: var(--text);
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--neon);
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.15s ease;
+    }
+
+    button.primary {
+      background: var(--neon);
+      color: #050505;
+      border-color: var(--neon);
+    }
+
+    button.primary:hover {
+      filter: brightness(1.08);
+      box-shadow: 0 0 14px rgba(57, 255, 20, 0.4);
+    }
+
+    button.outline {
+      border-color: var(--neon);
+      color: var(--neon);
+      background: transparent;
+    }
+
+    button.outline.active, button.outline:hover {
+      background: var(--neon);
+      color: #050505;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Placar / Jogadores */
+    .players-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 12px;
+    }
+
+    .player-box {
+      background: var(--card-2);
+      border: 1px solid #262626;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .player-box.occupied {
+      border-color: rgba(57, 255, 20, 0.55);
+    }
+
+    .player-slot {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .player-name {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin: 4px 0;
+    }
+
+    .player-points {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--neon);
+    }
+
+    /* Arena do Jogo */
+    .arena {
+      background: #090909;
+      border: 1px solid var(--neon);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .big-display {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 900;
+      color: var(--neon);
+      margin: 14px 0;
+      letter-spacing: 1px;
+    }
+
+    /* Calculadora Independente */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      max-width: 320px;
+    }
+
+    .calc-screen {
+      grid-column: span 4;
+      background: #050505;
+      border: 1px solid var(--neon);
+      color: var(--neon);
+      font-size: 1.4rem;
+      font-weight: 800;
+      text-align: right;
+      padding: 12px;
+      border-radius: 10px;
+      min-height: 50px;
+      overflow-x: auto;
+    }
+
+    .status-bar {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">🦎 LARGATIXA RICA</div>
+    <div class="row">
+      <span class="badge">100% RECREATIVO • SEM DINHEIRO REAL</span>
+      <span id="connStatus" class="badge">Conectando...</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- TELA INICIAL: ENTRAR OU CRIAR SALA -->
+    <section id="lobbySection" class="card">
+      <h2>Entrar ou Criar Sala Sincronizada</h2>
+      <p class="status-bar">Use o mesmo <strong>Código da Sala</strong> na TV e em até 7 celulares para jogar ao vivo.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>📺 Modo TV (Apresentador)</h3>
+          <p class="status-bar">Controla os 8 jogos na tela principal e exibe o placar de todos os jogadores.</p>
+          <div class="row">
+            <input id="tvRoomInput" type="text" maxlength="8" placeholder="Código (ex: LARG77)" style="text-transform:uppercase" />
+            <button id="btnStartTV" class="primary">Abrir Modo TV</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📱 Modo Celular (Até 7 Jogadores)</h3>
+          <p class="status-bar">Escolha a sala, seu lugar (1 a 7) e jogue com sua calculadora independente.</p>
+          <div class="row" style="margin-bottom:10px;">
+            <input id="mobileRoomInput" type="text" maxlength="8" placeholder="Código da Sala" style="text-transform:uppercase" />
+            <select id="slotSelect">
+              <option value="1">Jogador 1</option>
+              <option value="2">Jogador 2</option>
+              <option value="3">Jogador 3</option>
+              <option value="4">Jogador 4</option>
+              <option value="5">Jogador 5</option>
+              <option value="6">Jogador 6</option>
+              <option value="7">Jogador 7</option>
+            </select>
+          </div>
+          <div class="row">
+            <input id="playerNameInput" type="text" maxlength="16" placeholder="Seu apelido" />
+            <button id="btnJoinMobile" class="primary">Entrar no Celular</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SALA ATIVA (MODO TV OU MODO CELULAR) -->
+    <section id="roomSection" class="hidden">
+      <div class="card row" style="justify-content:space-between;">
+        <div>
+          <strong style="color:var(--neon); font-size:1.15rem;">SALA: <span id="activeRoomCode">---</span></strong>
+          <span id="roleLabel" class="badge" style="margin-left:8px;">---</span>
+        </div>
+        <button id="btnLeaveRoom" class="outline">Sair da Sala</button>
+      </div>
+
+      <!-- CONTROLE DOS 8 JOGOS (VISÍVEL NO MODO TV) -->
+      <div id="tvControlsCard" class="card hidden">
+        <h3>🎮 Escolha um dos 8 Jogos Recreativos</h3>
+        <div id="gamesMenu" class="grid-games"></div>
+      </div>
+
+      <!-- ARENA SINCRONIZADA (TODOS VEEM EM TEMPO REAL) -->
+      <div class="card arena">
+        <div class="badge" id="currentGameTitle">Aguardando jogo...</div>
+        <div id="arenaDisplay" class="big-display">PRONTO PARA JOGAR!</div>
+        <p id="arenaSub" class="status-bar">O apresentador no Modo TV escolhe o jogo e dispara a rodada.</p>
+
+        <!-- BOTÃO DE AÇÃO DO APRESENTADOR (MODO TV) -->
+        <div id="tvActionArea" class="row hidden" style="justify-content:center; margin-top:14px;">
+          <button id="btnTriggerRound" class="primary">⚡ Sortear / Iniciar Rodada</button>
+          <button id="btnResetScores" class="outline">Zerar Pontos da Sala</button>
+        </div>
+
+        <!-- PALPITE RÁPIDO DO CELULAR -->
+        <div id="mobileGuessArea" class="row hidden" style="justify-content:center; margin-top:14px;">
+          <input id="mobileGuessInput" type="text" maxlength="25" placeholder="Seu palpite / escolha na rodada" />
+          <button id="btnSendGuess" class="primary">Enviar Palpite</button>
+        </div>
+      </div>
+
+      <!-- PLACAR DOS 7 JOGADORES EM TEMPO REAL -->
+      <div class="card">
+        <h3>🏆 Jogadores Conectados (Até 7 Celulares)</h3>
+        <div id="playersBoard" class="players-grid"></div>
+      </div>
+
+      <!-- CONTROLE INDIVIDUAL + CALCULADORA INDEPENDENTE -->
+      <div class="grid-2">
+        <div id="myScoreCard" class="card hidden">
+          <h3>🎯 Meus Pontos Recreativos (<span id="mySlotTitle">Jogador</span>)</h3>
+          <p class="status-bar">Atualize seus pontos da rodada (sincroniza na TV na hora):</p>
+          <div class="row" style="margin-bottom:10px;">
+            <button class="outline score-delta" data-delta="10">+10</button>
+            <button class="outline score-delta" data-delta="50">+50</button>
+            <button class="outline score-delta" data-delta="100">+100</button>
+            <button class="outline score-delta" data-delta="-10">-10</button>
+            <button class="outline score-delta" data-delta="-50">-50</button>
+          </div>
+          <div class="row">
+            <input id="manualScoreInput" type="number" placeholder="Definir total de pontos" />
+            <button id="btnSetManualScore" class="primary">Atualizar</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🧮 Calculadora Independente (Local)</h3>
+          <p class="status-bar">Exclusiva do seu aparelho — não altera os dados dos outros jogadores.</p>
+          <div class="calc-grid">
+            <div id="calcScreen" class="calc-screen">0</div>
+            <button class="calc-btn" data-val="7">7</button>
+            <button class="calc-btn" data-val="8">8</button>
+            <button class="calc-btn" data-val="9">9</button>
+            <button class="calc-btn outline" data-val="/">÷</button>
+            <button class="calc-btn" data-val="4">4</button>
+            <button class="calc-btn" data-val="5">5</button>
+            <button class="calc-btn" data-val="6">6</button>
+            <button class="calc-btn outline" data-val="*">×</button>
+            <button class="calc-btn" data-val="1">1</button>
+            <button class="calc-btn" data-val="2">2</button>
+            <button class="calc-btn" data-val="3">3</button>
+            <button class="calc-btn outline" data-val="-">−</button>
+            <button class="calc-btn" id="calcClear" style="color:var(--danger)">C</button>
+            <button class="calc-btn" data-val="0">0</button>
+            <button class="calc-btn primary" id="calcEq">=</button>
+            <button class="calc-btn outline" data-val="+">+</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      updateDoc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDVYckHUaYMA4RmHFxu7Nwym6eAmvjydrI",
+      authDomain: "largatixa-rica-c055a.firebaseapp.com",
+      projectId: "largatixa-rica-c055a",
+      storageBucket: "largatixa-rica-c055a.firebasestorage.app",
+      messagingSenderId: "94911537324",
+      appId: "1:94911537324:web:9fadc8a135ff77af4fff09"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const connStatus = document.getElementById("connStatus");
+    connStatus.textContent = "Firebase Online";
+
+    const GAMES = [
+      { id: 1, name: "1. Roleta da Largatixa", run: () => {
+        const items = ["VERDE NEON (×2)", "PRETO (×2)", "DOURADO ESPECIAL (×5)", "BÔNUS +100 PTS", "GIRO EXTRA", "ESCUDO DE PONTOS"];
+        return items[Math.floor(Math.random() * items.length)];
+      }},
+      { id: 2, name: "2. Corrida dos Campeões", run: () => {
+        const horses = ["🐎 Trovão", "⚡ Relâmpago", "🌪️ Furacão", "🌑 Sombra", "⭐ Estrela"];
+        return "VENCEDOR: " + horses[Math.floor(Math.random() * horses.length)];
+      }},
+      { id: 3, name: "3. Dado Turbo", run: () => {
+        const d1 = Math.floor(Math.random() * 6) + 1;
+        const d2 = Math.floor(Math.random() * 6) + 1;
+        return `🎲 ${d1} + ${d2} = ${d1 + d2}`;
+      }},
+      { id: 4, name: "4. Número Secreto (1-50)", run: () => {
+        return `🔢 NÚMERO SORTEADO: ${Math.floor(Math.random() * 50) + 1}`;
+      }},
+      { id: 5, name: "5. Cara ou Coroa Neon", run: () => {
+        return Math.random() < 0.5 ? "🦎 CARA (LARGATIXA)" : "👑 COROA (NEON)";
+      }},
+      { id: 6, name: "6. Carta Maior", run: () => {
+        const vals = ["7", "8", "9", "10", "Valete (J)", "Dama (Q)", "Rei (K)", "Ás (A)"];
+        const suits = ["♠️", "♥️", "♦️", "♣️"];
+        return `🃏 ${vals[Math.floor(Math.random() * vals.length)]} de ${suits[Math.floor(Math.random() * suits.length)]}`;
+      }},
+      { id: 7, name: "7. Multiplicador Maluco", run: () => {
+        const mults = ["1.2x", "1.5x", "2.0x", "2.5x", "3.0x", "4.0x", "5.0x"];
+        return `🚀 PAROU EM ${mults[Math.floor(Math.random() * mults.length)]}`;
+      }},
+      { id: 8, name: "8. Desafio Relâmpago", run: () => {
+        const tasks = [
+          "Quem responder primeiro ganha +50 pts!",
+          "Todos ganham +20 pontos recreativos!",
+          "Duelo entre Jogador 1 e Jogador 2!",
+          "Rodada em dobro: +100 pts para o vencedor!",
+          "Escolha um número par ou ímpar antes do próximo giro!"
+        ];
+        return "⚡ " + tasks[Math.floor(Math.random() * tasks.length)];
+      }}
+    ];
+
+    let state = {
+      roomCode: null,
+      mode: null, // 'tv' | 'mobile'
+      slot: null,
+      playerName: null,
+      unsubscribe: null,
+      roomData: null
+    };
+
+    const lobbySection = document.getElementById("lobbySection");
+    const roomSection = document.getElementById("roomSection");
+    const activeRoomCode = document.getElementById("activeRoomCode");
+    const roleLabel = document.getElementById("roleLabel");
+    const tvControlsCard = document.getElementById("tvControlsCard");
+    const tvActionArea = document.getElementById("tvActionArea");
+    const mobileGuessArea = document.getElementById("mobileGuessArea");
+    const myScoreCard = document.getElementById("myScoreCard");
+    const gamesMenu = document.getElementById("gamesMenu");
+    const currentGameTitle = document.getElementById("currentGameTitle");
+    const arenaDisplay = document.getElementById("arenaDisplay");
+    const arenaSub = document.getElementById("arenaSub");
+    const playersBoard = document.getElementById("playersBoard");
+
+    function createDefaultPlayers() {
+      const p = {};
+      for (let i = 1; i <= 7; i++) {
+        p[i] = { active: false, name: `Vaga ${i}`, points: 100, guess: "" };
+      }
+      return p;
+    }
+
+    async function connectToRoom(code, mode, slot = null, name = "") {
+      const cleanCode = code.trim().toUpperCase();
+      if (!cleanCode) {
+        alert("Digite um código de sala (ex: LARG77).");
+        return;
+      }
+
+      const roomRef = doc(db, "salas", cleanCode);
+      const snap = await getDoc(roomRef);
+
+      if (!snap.exists()) {
+        await setDoc(roomRef, {
+          gameId: 1,
+          gameName: GAMES[0].name,
+          display: "SALA CRIADA! ESCOLHA UM JOGO",
+          sub: "Aguardando jogadores entrarem nos celulares...",
+          players: createDefaultPlayers(),
+          updatedAt: Date.now()
+        });
+      }
+
+      if (mode === "mobile") {
+        const cleanName = name.trim() || `Jogador ${slot}`;
+        await updateDoc(roomRef, {
+          [`players.${slot}.active`]: true,
+          [`players.${slot}.name`]: cleanName
+        });
+      }
+
+      state.roomCode = cleanCode;
+      state.mode = mode;
+      state.slot = slot;
+      state.playerName = name;
+
+      lobbySection.classList.add("hidden");
+      roomSection.classList.remove("hidden");
+      activeRoomCode.textContent = cleanCode;
+
+      if (mode === "tv") {
+        roleLabel.textContent = "📺 MODO TV (APRESENTADOR)";
+        tvControlsCard.classList.remove("hidden");
+        tvActionArea.classList.remove("hidden");
+        mobileGuessArea.classList.add("hidden");
+        myScoreCard.classList.add("hidden");
+      } else {
+        roleLabel.textContent = `📱 CELULAR • JOGADOR ${slot}`;
+        tvControlsCard.classList.add("hidden");
+        tvActionArea.classList.add("hidden");
+        mobileGuessArea.classList.remove("hidden");
+        myScoreCard.classList.remove("hidden");
+        document.getElementById("mySlotTitle").textContent = `Jogador ${slot}`;
+      }
+
+      if (state.unsubscribe) state.unsubscribe();
+      state.unsubscribe = onSnapshot(roomRef, (docSnap) => {
+        if (!docSnap.exists()) return;
+        state.roomData = docSnap.data();
+        renderRoom();
+      });
+    }
+
+    function renderRoom() {
+      const data = state.roomData;
+      if (!data) return;
+
+      currentGameTitle.textContent = data.gameName || "LARGATIXA RICA";
+      arenaDisplay.textContent = data.display || "PRONTO";
+      arenaSub.textContent = data.sub || "";
+
+      // Renderiza botões dos 8 jogos no Modo TV
+      gamesMenu.innerHTML = "";
+      GAMES.forEach((g) => {
+        const btn = document.createElement("button");
+        btn.className = "outline" + (data.gameId === g.id ? " active" : "");
+        btn.textContent = g.name;
+        btn.onclick = async () => {
+          const roomRef = doc(db, "salas", state.roomCode);
+          await updateDoc(roomRef, {
+            gameId: g.id,
+            gameName: g.name,
+            display: `${g.name.toUpperCase()} SELECIONADO`,
+            sub: "Jogadores: enviem seus palpites pelo celular e aguarde o sorteio!",
+            updatedAt: Date.now()
+          });
+        };
+        gamesMenu.appendChild(btn);
+      });
+
+      // Renderiza os 7 slots de jogadores
+      playersBoard.innerHTML = "";
+      const players = data.players || createDefaultPlayers();
+      for (let i = 1; i <= 7; i++) {
+        const p = players[i] || { active: false, name: `Vaga ${i}`, points: 100, guess: "" };
+        const box = document.createElement("div");
+        box.className = "player-box" + (p.active ? " occupied" : "");
+        box.innerHTML = `
+          <div class="player-slot">Celular #${i} • ${p.active ? "ONLINE" : "LIVRE"}</div>
+          <div class="player-name">${p.name}</div>
+          <div class="player-points">${p.points} pts</div>
+          <div class="status-bar" style="margin-top:4px;">Palpite: <strong>${p.guess || "—"}</strong></div>
+        `;
+        playersBoard.appendChild(box);
+      }
+    }
+
+    // Eventos Lobby
+    document.getElementById("btnStartTV").onclick = () => {
+      const code = document.getElementById("tvRoomInput").value || "LARG" + Math.floor(10 + Math.random() * 89);
+      document.getElementById("tvRoomInput").value = code;
+      connectToRoom(code, "tv");
+    };
+
+    document.getElementById("btnJoinMobile").onclick = () => {
+      const code = document.getElementById("mobileRoomInput").value;
+      const slot = document.getElementById("slotSelect").value;
+      const name = document.getElementById("playerNameInput").value;
+      connectToRoom(code, "mobile", slot, name);
+    };
+
+    document.getElementById("btnLeaveRoom").onclick = () => {
+      if (state.unsubscribe) state.unsubscribe();
+      state.roomCode = null;
+      roomSection.classList.add("hidden");
+      lobbySection.classList.remove("hidden");
+    };
+
+    // Eventos TV
+    document.getElementById("btnTriggerRound").onclick = async () => {
+      if (!state.roomData) return;
+      const currentGame = GAMES.find((g) => g.id === state.roomData.gameId) || GAMES[0];
+      const result = currentGame.run();
+      const roomRef = doc(db, "salas", state.roomCode);
+      await updateDoc(roomRef, {
+        display: result,
+        sub: `Rodada concluída às ${new Date().toLocaleTimeString("pt-BR")}`,
+        updatedAt: Date.now()
+      });
+    };
+
+    document.getElementById("btnResetScores").onclick = async () => {
+      if (!state.roomData) return;
+      const updated = { ...state.roomData.players };
+      for (let i = 1; i <= 7; i++) {
+        if (updated[i]) {
+          updated[i].points = 100;
+          updated[i].guess = "";
+        }
+      }
+      const roomRef = doc(db, "salas", state.roomCode);
+      await updateDoc(roomRef, { players: updated });
+    };
+
+    // Eventos Celular
+    document.getElementById("btnSendGuess").onclick = async () => {
+      const guess = document.getElementById("mobileGuessInput").value.trim();
+      if (!guess || !state.roomCode || !state.slot) return;
+      const roomRef = doc(db, "salas", state.roomCode);
+      await updateDoc(roomRef, {
+        [`players.${state.slot}.guess`]: guess
+      });
+      document.getElementById("mobileGuessInput").value = "";
+    };
+
+    document.querySelectorAll(".score-delta").forEach((btn) => {
+      btn.onclick = async () => {
+        if (!state.roomData || !state.slot) return;
+        const delta = Number(btn.dataset.delta);
+        const current = Number(state.roomData.players?.[state.slot]?.points ?? 100);
+        const roomRef = doc(db, "salas", state.roomCode);
+        await updateDoc(roomRef, {
+          [`players.${state.slot}.points`]: Math.max(0, current + delta)
+        });
+      };
+    });
+
+    document.getElementById("btnSetManualScore").onclick = async () => {
+      const val = Number(document.getElementById("manualScoreInput").value);
+      if (Number.isNaN(val) || !state.roomCode || !state.slot) return;
+      const roomRef = doc(db, "salas", state.roomCode);
+      await updateDoc(roomRef, {
+        [`players.${state.slot}.points`]: Math.max(0, val)
+      });
+      document.getElementById("manualScoreInput").value = "";
+    };
+
+    // Calculadora Independente (100% local no aparelho)
+    let calcExpr = "";
+    const calcScreen = document.getElementById("calcScreen");
+    document.querySelectorAll(".calc-btn[data-val]").forEach((btn) => {
+      btn.onclick = () => {
+        calcExpr += btn.dataset.val;
+        calcScreen.textContent = calcExpr;
+      };
+    });
+    document.getElementById("calcClear").onclick = () => {
+      calcExpr = "";
+      calcScreen.textContent = "0";
+    };
+    document.getElementById("calcEq").onclick = () => {
+      try {
+        if (!/^[0-9+\-*/.() ]+$/.test(calcExpr)) return;
+        const res = Function(`"use strict"; return (${calcExpr})`)();
+        calcExpr = String(Number.isFinite(res) ? Number(res.toFixed(4)) : 0);
+        calcScreen.textContent = calcExpr;
+      } catch {
+        calcExpr = "";
+        calcScreen.textContent = "Erro";
+      }
+    };
+  </script>
+</body>
+</html>
