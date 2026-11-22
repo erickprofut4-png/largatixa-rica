@@ -12,12 +12,9 @@
       --border: #1e3324;
       --neon: #22ff66;
       --neon-soft: rgba(34, 255, 102, 0.14);
-      --neon-glow: 0 0 18px rgba(34, 255, 102, 0.28);
+      --neon-glow: 0 0 18px rgba(34, 255, 102, 0.25);
       --text: #f2fff6;
       --muted: #8ca694;
-      --accent-blue: #38bdf8;
-      --accent-amber: #fbbf24;
-      --accent-rose: #fb7185;
     }
 
     * {
@@ -37,7 +34,7 @@
       min-height: 100vh;
       line-height: 1.45;
       padding: 14px;
-      padding-bottom: 54px;
+      padding-bottom: 56px;
     }
 
     .wrap {
@@ -65,7 +62,6 @@
       font-weight: 900;
       color: var(--neon);
       letter-spacing: 0.05em;
-      text-shadow: 0 0 14px rgba(34, 255, 102, 0.35);
     }
 
     .sub {
@@ -133,190 +129,10 @@
 
     input:focus, select:focus {
       border-color: var(--neon);
-      box-shadow: 0 0 0 2px rgba(34, 255, 102, 0.16);
     }
 
     .games-tabs {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 7px;
-      margin-bottom: 14px;
-    }
-
-    @media (min-width: 640px) {
-      .games-tabs {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    .g-btn {
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 11px 10px;
-      font-size: 0.84rem;
-      font-weight: 800;
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .g-btn.active {
-      background: var(--neon-soft);
-      color: var(--neon);
-      border-color: var(--neon);
-      box-shadow: 0 0 12px rgba(34, 255, 102, 0.2);
-    }
-
-    .game-panel {
-      display: none;
-    }
-
-    .game-panel.active {
-      display: block;
-    }
-
-    .game-panel h2 {
-      color: var(--neon);
-      font-size: 1.1rem;
-      margin-bottom: 4px;
-    }
-
-    .game-panel p {
-      color: var(--muted);
-      font-size: 0.84rem;
-      margin-bottom: 12px;
-    }
-
-    .num-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 6px;
-      margin: 10px 0;
-    }
-
-    @media (min-width: 640px) {
-      .num-grid.wide {
-        grid-template-columns: repeat(10, 1fr);
-      }
-    }
-
-    .n-btn {
-      min-height: 44px;
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .n-btn.sel {
-      background: var(--neon);
-      color: #051108;
-      border-color: var(--neon);
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    button.primary {
-      background: var(--neon);
-      color: #051108;
-      border: none;
-      border-radius: 12px;
-      padding: 11px 16px;
-      font-size: 0.86rem;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    button.primary:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    button.sec {
-      background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 0.84rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .out-box {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-top: 12px;
-      min-height: 64px;
-      white-space: pre-line;
-      font-size: 0.92rem;
-    }
-
-    .tv-big {
-      text-align: center;
-      padding: 24px 14px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      margin-top: 12px;
-    }
-
-    .tv-num {
-      font-size: 3rem;
-      font-weight: 900;
-      color: var(--neon);
-      line-height: 1.1;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--neon);
-      color: #051108;
-      font-weight: 800;
-      font-size: 0.84rem;
-      padding: 10px 18px;
-      border-radius: 999px;
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.2s ease;
-      z-index: 999;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <header>
-      <div>
-        <div class="title">LARGATIXA RICA</div>
-        <div id="header-sub" class="sub">Modo Celular • Todos os 8 jogos liberados</div>
-      </div>
-      <div class="mode-switch">
-        <button type="button" id="btn-mode-celular" class="mode-btn active" onclick="trocarModo('celular')">Modo Celular</button>
-        <button type="button" id="btn-mode-tv" class="mode-btn" onclick="trocarModo('tv')">Modo TV</button>
-      </div>
-    </header>
-
-    <!-- MODO CELULAR -->
-    <div id="view-celular" class="view-section active">
-      <section class="card">
-        <div class="player-bar">
-          
+      margin-bottom: 14px
