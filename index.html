@@ -79,7 +79,7 @@
 
     .grid-games {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 10px;
     }
 
@@ -103,13 +103,18 @@
       transition: 0.15s ease;
     }
 
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     button.primary {
       background: var(--neon);
       color: #050505;
       border-color: var(--neon);
     }
 
-    button.primary:hover {
+    button.primary:hover:not(:disabled) {
       filter: brightness(1.08);
       box-shadow: 0 0 14px rgba(57, 255, 20, 0.4);
     }
@@ -120,7 +125,7 @@
       background: transparent;
     }
 
-    button.outline.active, button.outline:hover {
+    button.outline.active, button.outline:hover:not(:disabled) {
       background: var(--neon);
       color: #050505;
     }
@@ -156,6 +161,17 @@
       font-size: 0.78rem;
       color: var(--muted);
       text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .color-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid #fff;
     }
 
     .player-name {
@@ -180,33 +196,98 @@
     }
 
     .big-display {
-      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-size: clamp(1.4rem, 3.2vw, 2.3rem);
       font-weight: 900;
       color: var(--neon);
       margin: 14px 0;
-      letter-spacing: 1px;
+      letter-spacing: 0.8px;
+      min-height: 44px;
     }
 
-    /* Calculadora Independente */
-    .calc-grid {
+    .spin-anim {
+      animation: pulseNeon 0.35s ease-in-out 2;
+    }
+
+    @keyframes pulseNeon {
+      0% { transform: scale(0.97); opacity: 0.6; }
+      50% { transform: scale(1.03); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .num-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      max-width: 320px;
+      grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+      gap: 6px;
+      margin-top: 10px;
     }
 
+    .num-btn {
+      padding: 8px 4px;
+      font-size: 0.9rem;
+      background: #141414;
+      border: 1px solid #2e2e2e;
+      color: var(--text);
+    }
+
+    .num-btn.selected {
+      background: var(--neon);
+      color: #050505;
+      border-color: var(--neon);
+      font-weight: 800;
+    }
+
+    .bingo-card {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      max-width: 290px;
+      margin: 10px auto;
+    }
+
+    .bingo-cell {
+      padding: 9px 4px;
+      border-radius: 8px;
+      background: #151515;
+      border: 1px solid #333;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .bingo-cell.marked {
+      background: var(--neon);
+      color: #050505;
+      border-color: var(--neon);
+    }
+
+    .table-box {
+      background: #111;
+      border: 1px solid #252525;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 12px;
+      text-align: left;
+    }
+
+    /* Calculadora Independente (+1, +5, +10, +25, Desfazer, Zerar) */
     .calc-screen {
-      grid-column: span 4;
       background: #050505;
       border: 1px solid var(--neon);
       color: var(--neon);
-      font-size: 1.4rem;
-      font-weight: 800;
+      font-size: 1.5rem;
+      font-weight: 900;
       text-align: right;
-      padding: 12px;
+      padding: 12px 14px;
       border-radius: 10px;
-      min-height: 50px;
-      overflow-x: auto;
+      margin-bottom: 10px;
+      max-width: 360px;
+    }
+
+    .calc-steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-width: 360px;
+      margin-bottom: 8px;
     }
 
     .status-bar {
@@ -225,126 +306,128 @@
   </header>
 
   <main>
-    <!-- TELA INICIAL: ENTRAR OU CRIAR SALA -->
+    <!-- TELA INICIAL: MODOS TV E CELULAR -->
     <section id="lobbySection" class="card">
-      <h2>Entrar ou Criar Sala Sincronizada</h2>
-      <p class="status-bar">Use o mesmo <strong>Código da Sala</strong> na TV e em até 7 celulares para jogar ao vivo.</p>
+      <h2>LARGATIXA RICA — Escolha o Modo</h2>
+      <p class="status-bar">Visual preto e verde neon recreativo. Use o mesmo <strong>Código da Sala</strong> na TV e em até 7 celulares.</p>
 
       <div class="grid-2">
+        <!-- MODO TV NA PÁGINA INICIAL -->
         <div class="card">
           <h3>📺 Modo TV (Apresentador)</h3>
-          <p class="status-bar">Controla os 8 jogos na tela principal e exibe o placar de todos os jogadores.</p>
-          <div class="row">
+          <p class="status-bar">Exclusivo para o apresentador. Controla todos os jogos, sorteios ilimitados e resultados. Sem cadastro como jogador.</p>
+          <div class="row" style="margin-bottom:12px;">
             <input id="tvRoomInput" type="text" maxlength="8" placeholder="Código (ex: LARG77)" style="text-transform:uppercase" />
             <button id="btnStartTV" class="primary">Abrir Modo TV</button>
           </div>
+
+          <!-- CALCULADORA INDEPENDENTE DA TV NA PÁGINA INICIAL -->
+          <div style="margin-top:12px; padding-top:12px; border-top:1px solid #222;">
+            <div class="status-bar" style="margin-bottom:6px;"><strong>🧮 Calculadora da TV (Independente)</strong></div>
+            <div id="lobbyTvCalcScreen" class="calc-screen">0</div>
+            <div class="calc-steps">
+              <button class="outline calc-add" data-calc="lobbyTv" data-val="1">+1</button>
+              <button class="outline calc-add" data-calc="lobbyTv" data-val="5">+5</button>
+              <button class="outline calc-add" data-calc="lobbyTv" data-val="10">+10</button>
+              <button class="outline calc-add" data-calc="lobbyTv" data-val="25">+25</button>
+            </div>
+            <div class="calc-steps">
+              <button class="outline calc-undo" data-calc="lobbyTv">Desfazer</button>
+              <button class="outline calc-zero" data-calc="lobbyTv" style="color:var(--danger); border-color:var(--danger);">Zerar</button>
+            </div>
+          </div>
         </div>
 
+        <!-- MODO CELULAR NA PÁGINA INICIAL (SEM CALCULADORA AQUI) -->
         <div class="card">
-          <h3>📱 Modo Celular (Até 7 Jogadores)</h3>
-          <p class="status-bar">Escolha a sala, seu lugar (1 a 7) e jogue com sua calculadora independente.</p>
+          <h3>📱 Modo Celular (Até 7 Participantes)</h3>
+          <p class="status-bar">Cada participante começa com <strong>40 pontos fictícios</strong>, escolhe seu próprio jogo e vê seu saldo. A calculadora aparece antes de entrar em um jogo.</p>
           <div class="row" style="margin-bottom:10px;">
             <input id="mobileRoomInput" type="text" maxlength="8" placeholder="Código da Sala" style="text-transform:uppercase" />
             <select id="slotSelect">
-              <option value="1">Jogador 1</option>
-              <option value="2">Jogador 2</option>
-              <option value="3">Jogador 3</option>
-              <option value="4">Jogador 4</option>
-              <option value="5">Jogador 5</option>
-              <option value="6">Jogador 6</option>
-              <option value="7">Jogador 7</option>
+              <option value="1">Participante 1</option>
+              <option value="2">Participante 2</option>
+              <option value="3">Participante 3</option>
+              <option value="4">Participante 4</option>
+              <option value="5">Participante 5</option>
+              <option value="6">Participante 6</option>
+              <option value="7">Participante 7</option>
             </select>
           </div>
           <div class="row">
-            <input id="playerNameInput" type="text" maxlength="16" placeholder="Seu apelido" />
+            <input id="playerNameInput" type="text" maxlength="16" placeholder="Nome / Apelido" />
             <button id="btnJoinMobile" class="primary">Entrar no Celular</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- SALA ATIVA (MODO TV OU MODO CELULAR) -->
+    <!-- SALA ATIVA -->
     <section id="roomSection" class="hidden">
       <div class="card row" style="justify-content:space-between;">
         <div>
           <strong style="color:var(--neon); font-size:1.15rem;">SALA: <span id="activeRoomCode">---</span></strong>
           <span id="roleLabel" class="badge" style="margin-left:8px;">---</span>
+          <span id="myBalanceBadge" class="badge hidden" style="margin-left:8px;">Saldo: 40 pts</span>
         </div>
-        <button id="btnLeaveRoom" class="outline">Sair da Sala</button>
+        <div class="row">
+          <button id="btnNewRoundReset" class="outline hidden">Nova Rodada</button>
+          <button id="btnLeaveRoom" class="outline">Sair da Sala</button>
+        </div>
       </div>
 
-      <!-- CONTROLE DOS 8 JOGOS (VISÍVEL NO MODO TV) -->
-      <div id="tvControlsCard" class="card hidden">
-        <h3>🎮 Escolha um dos 8 Jogos Recreativos</h3>
+      <!-- CALCULADORA ANTES DE ENTRAR EM UM JOGO (MODO CELULAR) -->
+      <div id="preGameCalcCard" class="card hidden">
+        <h3>🧮 Calculadora Independente (Antes de Entrar no Jogo)</h3>
+        <p class="status-bar">Exclusiva do seu aparelho. Ajuste seus valores e toque em <strong>Entrar no Jogo Selecionado</strong>.</p>
+        <div id="mobileCalcScreen" class="calc-screen">0</div>
+        <div class="calc-steps">
+          <button class="outline calc-add" data-calc="mobile" data-val="1">+1</button>
+          <button class="outline calc-add" data-calc="mobile" data-val="5">+5</button>
+          <button class="outline calc-add" data-calc="mobile" data-val="10">+10</button>
+          <button class="outline calc-add" data-calc="mobile" data-val="25">+25</button>
+        </div>
+        <div class="calc-steps">
+          <button class="outline calc-undo" data-calc="mobile">Desfazer</button>
+          <button class="outline calc-zero" data-calc="mobile" style="color:var(--danger); border-color:var(--danger);">Zerar</button>
+          <button id="btnEnterSelectedGame" class="primary">Entrar no Jogo</button>
+        </div>
+      </div>
+
+      <!-- SELEÇÃO DOS 8 JOGOS (TV CONTROLA TODOS; CELULAR ESCOLHE O SEU) -->
+      <div id="gamesCard" class="card">
+        <h3 id="gamesCardTitle">🎮 Os 8 Jogos Recreativos</h3>
         <div id="gamesMenu" class="grid-games"></div>
       </div>
 
-      <!-- ARENA SINCRONIZADA (TODOS VEEM EM TEMPO REAL) -->
+      <!-- ARENA DO JOGO SINCRONIZADA -->
       <div class="card arena">
-        <div class="badge" id="currentGameTitle">Aguardando jogo...</div>
+        <div class="badge" id="currentGameTitle">1. CAÇA-NÍQUEL</div>
         <div id="arenaDisplay" class="big-display">PRONTO PARA JOGAR!</div>
-        <p id="arenaSub" class="status-bar">O apresentador no Modo TV escolhe o jogo e dispara a rodada.</p>
+        <p id="arenaSub" class="status-bar">Aguardando rodada...</p>
 
-        <!-- BOTÃO DE AÇÃO DO APRESENTADOR (MODO TV) -->
+        <!-- CONTROLES ESPECÍFICOS DO JOGO (CRAPS, ROLETA, PÔQUER, BINGO) -->
+        <div id="gameInteractiveBox" class="table-box hidden"></div>
+
+        <!-- BOTÃO DE SORTEIO / AÇÃO DA TV -->
         <div id="tvActionArea" class="row hidden" style="justify-content:center; margin-top:14px;">
-          <button id="btnTriggerRound" class="primary">⚡ Sortear / Iniciar Rodada</button>
-          <button id="btnResetScores" class="outline">Zerar Pontos da Sala</button>
+          <button id="btnTvDraw" class="primary">⚡ Sortear / Rodar (TV)</button>
+          <button id="btnTvFinalBingo" class="outline">🏆 Rodada Final Especial (Bingo)</button>
+          <button id="btnResetScores" class="outline">Reiniciar Pontos (40 pts)</button>
         </div>
 
-        <!-- PALPITE RÁPIDO DO CELULAR -->
-        <div id="mobileGuessArea" class="row hidden" style="justify-content:center; margin-top:14px;">
-          <input id="mobileGuessInput" type="text" maxlength="25" placeholder="Seu palpite / escolha na rodada" />
-          <button id="btnSendGuess" class="primary">Enviar Palpite</button>
+        <!-- BOTÃO DE SORTEIO / AÇÃO DO CELULAR (1 POR JOGO) -->
+        <div id="mobileActionArea" class="row hidden" style="justify-content:center; margin-top:14px;">
+          <button id="btnMobileDraw" class="primary">🎲 Realizar Meu Sorteio (1x neste jogo)</button>
+          <button id="btnClearSelection" class="outline hidden">Limpar Seleção</button>
+          <button id="btnCallBingo" class="outline hidden">🎉 Anunciar Bingo!</button>
         </div>
       </div>
 
-      <!-- PLACAR DOS 7 JOGADORES EM TEMPO REAL -->
+      <!-- PLACAR E PARTICIPANTES (VISÍVEL NA TV E RESUMO NO CELULAR) -->
       <div class="card">
-        <h3>🏆 Jogadores Conectados (Até 7 Celulares)</h3>
+        <h3>🏆 Participantes e Saldos Recreativos (Até 7)</h3>
         <div id="playersBoard" class="players-grid"></div>
-      </div>
-
-      <!-- CONTROLE INDIVIDUAL + CALCULADORA INDEPENDENTE -->
-      <div class="grid-2">
-        <div id="myScoreCard" class="card hidden">
-          <h3>🎯 Meus Pontos Recreativos (<span id="mySlotTitle">Jogador</span>)</h3>
-          <p class="status-bar">Atualize seus pontos da rodada (sincroniza na TV na hora):</p>
-          <div class="row" style="margin-bottom:10px;">
-            <button class="outline score-delta" data-delta="10">+10</button>
-            <button class="outline score-delta" data-delta="50">+50</button>
-            <button class="outline score-delta" data-delta="100">+100</button>
-            <button class="outline score-delta" data-delta="-10">-10</button>
-            <button class="outline score-delta" data-delta="-50">-50</button>
-          </div>
-          <div class="row">
-            <input id="manualScoreInput" type="number" placeholder="Definir total de pontos" />
-            <button id="btnSetManualScore" class="primary">Atualizar</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>🧮 Calculadora Independente (Local)</h3>
-          <p class="status-bar">Exclusiva do seu aparelho — não altera os dados dos outros jogadores.</p>
-          <div class="calc-grid">
-            <div id="calcScreen" class="calc-screen">0</div>
-            <button class="calc-btn" data-val="7">7</button>
-            <button class="calc-btn" data-val="8">8</button>
-            <button class="calc-btn" data-val="9">9</button>
-            <button class="calc-btn outline" data-val="/">÷</button>
-            <button class="calc-btn" data-val="4">4</button>
-            <button class="calc-btn" data-val="5">5</button>
-            <button class="calc-btn" data-val="6">6</button>
-            <button class="calc-btn outline" data-val="*">×</button>
-            <button class="calc-btn" data-val="1">1</button>
-            <button class="calc-btn" data-val="2">2</button>
-            <button class="calc-btn" data-val="3">3</button>
-            <button class="calc-btn outline" data-val="-">−</button>
-            <button class="calc-btn" id="calcClear" style="color:var(--danger)">C</button>
-            <button class="calc-btn" data-val="0">0</button>
-            <button class="calc-btn primary" id="calcEq">=</button>
-            <button class="calc-btn outline" data-val="+">+</button>
-          </div>
-        </div>
       </div>
     </section>
   </main>
@@ -375,77 +458,275 @@
     const connStatus = document.getElementById("connStatus");
     connStatus.textContent = "Firebase Online";
 
+    const INITIAL_POINTS = 40;
+    const PLAYER_COLORS = {
+      1: "#39ff14",
+      2: "#00e5ff",
+      3: "#ffd600",
+      4: "#ff4081",
+      5: "#ff9100",
+      6: "#b388ff",
+      7: "#64ffda"
+    };
+
     const GAMES = [
-      { id: 1, name: "1. Roleta da Largatixa", run: () => {
-        const items = ["VERDE NEON (×2)", "PRETO (×2)", "DOURADO ESPECIAL (×5)", "BÔNUS +100 PTS", "GIRO EXTRA", "ESCUDO DE PONTOS"];
-        return items[Math.floor(Math.random() * items.length)];
-      }},
-      { id: 2, name: "2. Corrida dos Campeões", run: () => {
-        const horses = ["🐎 Trovão", "⚡ Relâmpago", "🌪️ Furacão", "🌑 Sombra", "⭐ Estrela"];
-        return "VENCEDOR: " + horses[Math.floor(Math.random() * horses.length)];
-      }},
-      { id: 3, name: "3. Dado Turbo", run: () => {
+      { id: 1, name: "1. Caça-níquel", modeType: "slot" },
+      { id: 2, name: "2. Craps", modeType: "craps" },
+      { id: 3, name: "3. Roleta", modeType: "roulette" },
+      { id: 4, name: "4. Pôquer", modeType: "poker" },
+      { id: 5, name: "5. Corrida de Cavalos", modeType: "horse" },
+      { id: 6, name: "6. Bingo", modeType: "bingo" },
+      { id: 7, name: "7. Blackjack (21)", modeType: "blackjack" },
+      { id: 8, name: "8. Baccarat", modeType: "baccarat" }
+    ];
+
+    const DECK_CARDS = [
+      "A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠",
+      "A♥", "2♥", "3♥", "4♥", "5♥", "6♥", "7♥", "8♥", "9♥", "10♥", "J♥", "Q♥", "K♥",
+      "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦",
+      "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣"
+    ];
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function drawCards(count) {
+      const pool = [...DECK_CARDS];
+      const out = [];
+      for (let i = 0; i < count && pool.length > 0; i++) {
+        const idx = Math.floor(Math.random() * pool.length);
+        out.push(pool.splice(idx, 1)[0]);
+      }
+      return out;
+    }
+
+    function generateBingoCard() {
+      const cols = [
+        [1, 15],
+        [16, 30],
+        [31, 45],
+        [46, 60],
+        [61, 75]
+      ];
+      const card = [];
+      for (let c = 0; c < 5; c++) {
+        const [min, max] = cols[c];
+        const nums = [];
+        while (nums.length < 5) {
+          const n = Math.floor(Math.random() * (max - min + 1)) + min;
+          if (!nums.includes(n)) nums.push(n);
+        }
+        card.push(nums);
+      }
+      // Transpõe para linhas de 5 colunas
+      const rows = [];
+      for (let r = 0; r < 5; r++) {
+        const row = [];
+        for (let c = 0; c < 5; c++) {
+          row.push(r === 2 && c === 2 ? "FREE" : card[c][r]);
+        }
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    function runGameDraw(gameId, roomData) {
+      if (gameId === 1) {
+        // 1. CAÇA-NÍQUEL (3 rolos)
+        const syms = ["🦎", "💎", "🍀", "⭐", "🔔", "7️⃣"];
+        const r1 = pickRandom(syms);
+        const r2 = pickRandom(syms);
+        const r3 = pickRandom(syms);
+        const match = r1 === r2 && r2 === r3 ? " — TRINCA NEON!" : (r1 === r2 || r2 === r3 || r1 === r3 ? " — PAR RECREATIVO!" : "");
+        return {
+          display: `[ ${r1} ]  [ ${r2} ]  [ ${r3} ]`,
+          sub: `Caça-níquel (3 rolos)${match}`
+        };
+      }
+
+      if (gameId === 2) {
+        // 2. CRAPS (dois dados, 2 a 12)
         const d1 = Math.floor(Math.random() * 6) + 1;
         const d2 = Math.floor(Math.random() * 6) + 1;
-        return `🎲 ${d1} + ${d2} = ${d1 + d2}`;
-      }},
-      { id: 4, name: "4. Número Secreto (1-50)", run: () => {
-        return `🔢 NÚMERO SORTEADO: ${Math.floor(Math.random() * 50) + 1}`;
-      }},
-      { id: 5, name: "5. Cara ou Coroa Neon", run: () => {
-        return Math.random() < 0.5 ? "🦎 CARA (LARGATIXA)" : "👑 COROA (NEON)";
-      }},
-      { id: 6, name: "6. Carta Maior", run: () => {
-        const vals = ["7", "8", "9", "10", "Valete (J)", "Dama (Q)", "Rei (K)", "Ás (A)"];
-        const suits = ["♠️", "♥️", "♦️", "♣️"];
-        return `🃏 ${vals[Math.floor(Math.random() * vals.length)]} de ${suits[Math.floor(Math.random() * suits.length)]}`;
-      }},
-      { id: 7, name: "7. Multiplicador Maluco", run: () => {
-        const mults = ["1.2x", "1.5x", "2.0x", "2.5x", "3.0x", "4.0x", "5.0x"];
-        return `🚀 PAROU EM ${mults[Math.floor(Math.random() * mults.length)]}`;
-      }},
-      { id: 8, name: "8. Desafio Relâmpago", run: () => {
-        const tasks = [
-          "Quem responder primeiro ganha +50 pts!",
-          "Todos ganham +20 pontos recreativos!",
-          "Duelo entre Jogador 1 e Jogador 2!",
-          "Rodada em dobro: +100 pts para o vencedor!",
-          "Escolha um número par ou ímpar antes do próximo giro!"
-        ];
-        return "⚡ " + tasks[Math.floor(Math.random() * tasks.length)];
-      }}
-    ];
+        const sum = d1 + d2;
+        return {
+          display: `🎲 ${d1} + ${d2} = ${sum}`,
+          sub: `Craps: número sorteado ${sum} (tabela 2 a 12)`
+        };
+      }
+
+      if (gameId === 3) {
+        // 3. ROLETA (0 a 36)
+        const num = Math.floor(Math.random() * 37);
+        const color = num === 0 ? "VERDE NEON" : (num % 2 === 0 ? "PRETO" : "VERDE");
+        return {
+          display: `🎡 NÚMERO ${num} (${color})`,
+          sub: `Roleta de 0 a 36 — resultado compartilhado para todos`
+        };
+      }
+
+      if (gameId === 4) {
+        // 4. PÔQUER (Texas Hold'em: 5 comunitárias + 2 privadas por jogador)
+        const comm = drawCards(5);
+        const privateHands = {};
+        for (let i = 1; i <= 7; i++) {
+          privateHands[i] = drawCards(2);
+        }
+        return {
+          display: `🃏 Mesa: ${comm.join("  ")}`,
+          sub: "Texas Hold'em: 5 cartas comunitárias na mesa e 2 cartas privadas enviadas a cada celular.",
+          communityCards: comm,
+          privateHands
+        };
+      }
+
+      if (gameId === 5) {
+        // 5. CORRIDA DE CAVALOS
+        const horses = ["🐎 Trovão", "⚡ Relâmpago", "🌪️ Furacão", "🌑 Sombra", "⭐ Estrela", "🔥 Cometa"];
+        const order = [...horses].sort(() => Math.random() - 0.5);
+        return {
+          display: `🏁 VENCEDOR: ${order[0]}`,
+          sub: `Largada e chegada: 1º ${order[0]} • 2º ${order[1]} • 3º ${order[2]}`
+        };
+      }
+
+      if (gameId === 6) {
+        // 6. BINGO (1 a 75 sem repetição, exclusivo TV)
+        const drawn = Array.isArray(roomData?.bingoDrawn) ? [...roomData.bingoDrawn] : [];
+        const available = [];
+        for (let n = 1; n <= 75; n++) {
+          if (!drawn.includes(n)) available.push(n);
+        }
+        if (available.length === 0) {
+          return {
+            display: "BINGO COMPLETO (1–75)",
+            sub: "Todos os 75 números já foram sorteados nesta rodada.",
+            bingoDrawn: drawn
+          };
+        }
+        const nextNum = pickRandom(available);
+        drawn.push(nextNum);
+        return {
+          display: `🎱 BOLA ${nextNum} (Total sorteados: ${drawn.length}/75)`,
+          sub: `Números sorteados: ${drawn.join(", ")}`,
+          bingoDrawn: drawn
+        };
+      }
+
+      if (gameId === 7) {
+        // 7. BLACKJACK (21)
+        const pHand = drawCards(2);
+        const dHand = drawCards(2);
+        return {
+          display: `🃏 Mão: ${pHand.join(" ")}  |  Banca: ${dHand.join(" ")}`,
+          sub: "Blackjack (21) recreativo — distribuição de cartas concluída"
+        };
+      }
+
+      // 8. BACCARAT
+      const playerHand = drawCards(2);
+      const bankerHand = drawCards(2);
+      const winner = Math.random() < 0.45 ? "JOGADOR" : (Math.random() < 0.85 ? "BANCA" : "EMPATE");
+      return {
+        display: `🂠 Jogador: ${playerHand.join(" ")} vs Banca: ${bankerHand.join(" ")}`,
+        sub: `Baccarat recreativo — Resultado: ${winner}`
+      };
+    }
 
     let state = {
       roomCode: null,
       mode: null, // 'tv' | 'mobile'
       slot: null,
       playerName: null,
+      chosenGameId: 1,
+      enteredGame: false,
       unsubscribe: null,
-      roomData: null
+      roomData: null,
+      markedBingo: [],
+      calcs: {
+        lobbyTv: { value: 0, history: [] },
+        mobile: { value: 0, history: [] }
+      }
     };
 
     const lobbySection = document.getElementById("lobbySection");
     const roomSection = document.getElementById("roomSection");
     const activeRoomCode = document.getElementById("activeRoomCode");
     const roleLabel = document.getElementById("roleLabel");
-    const tvControlsCard = document.getElementById("tvControlsCard");
-    const tvActionArea = document.getElementById("tvActionArea");
-    const mobileGuessArea = document.getElementById("mobileGuessArea");
-    const myScoreCard = document.getElementById("myScoreCard");
+    const myBalanceBadge = document.getElementById("myBalanceBadge");
+    const btnNewRoundReset = document.getElementById("btnNewRoundReset");
+    const preGameCalcCard = document.getElementById("preGameCalcCard");
+    const gamesCardTitle = document.getElementById("gamesCardTitle");
     const gamesMenu = document.getElementById("gamesMenu");
     const currentGameTitle = document.getElementById("currentGameTitle");
     const arenaDisplay = document.getElementById("arenaDisplay");
     const arenaSub = document.getElementById("arenaSub");
+    const gameInteractiveBox = document.getElementById("gameInteractiveBox");
+    const tvActionArea = document.getElementById("tvActionArea");
+    const mobileActionArea = document.getElementById("mobileActionArea");
+    const btnClearSelection = document.getElementById("btnClearSelection");
+    const btnCallBingo = document.getElementById("btnCallBingo");
     const playersBoard = document.getElementById("playersBoard");
 
     function createDefaultPlayers() {
       const p = {};
       for (let i = 1; i <= 7; i++) {
-        p[i] = { active: false, name: `Vaga ${i}`, points: 100, guess: "" };
+        p[i] = {
+          active: false,
+          name: `Participante ${i}`,
+          points: INITIAL_POINTS,
+          color: PLAYER_COLORS[i],
+          selectedNumbers: [],
+          drawnGames: [],
+          bingoName: "",
+          bingoCard: generateBingoCard(),
+          bingoClaimed: false
+        };
       }
       return p;
     }
+
+    // Calculadoras independentes (+1, +5, +10, +25, Desfazer, Zerar)
+    function updateCalcUI(key) {
+      const calc = state.calcs[key];
+      const el = key === "lobbyTv"
+        ? document.getElementById("lobbyTvCalcScreen")
+        : document.getElementById("mobileCalcScreen");
+      if (el) el.textContent = String(calc.value);
+    }
+
+    document.querySelectorAll(".calc-add").forEach((btn) => {
+      btn.onclick = () => {
+        const key = btn.dataset.calc;
+        const delta = Number(btn.dataset.val);
+        const calc = state.calcs[key];
+        calc.history.push(calc.value);
+        calc.value += delta;
+        updateCalcUI(key);
+      };
+    });
+
+    document.querySelectorAll(".calc-undo").forEach((btn) => {
+      btn.onclick = () => {
+        const key = btn.dataset.calc;
+        const calc = state.calcs[key];
+        if (calc.history.length > 0) {
+          calc.value = calc.history.pop();
+          updateCalcUI(key);
+        }
+      };
+    });
+
+    document.querySelectorAll(".calc-zero").forEach((btn) => {
+      btn.onclick = () => {
+        const key = btn.dataset.calc;
+        const calc = state.calcs[key];
+        calc.history.push(calc.value);
+        calc.value = 0;
+        updateCalcUI(key);
+      };
+    });
 
     async function connectToRoom(code, mode, slot = null, name = "") {
       const cleanCode = code.trim().toUpperCase();
@@ -461,25 +742,34 @@
         await setDoc(roomRef, {
           gameId: 1,
           gameName: GAMES[0].name,
-          display: "SALA CRIADA! ESCOLHA UM JOGO",
-          sub: "Aguardando jogadores entrarem nos celulares...",
+          display: "LARGATIXA RICA — SALA PRONTA",
+          sub: "TV controla todos os jogos e sorteios; celulares participam com 40 pontos recreativos.",
+          bingoDrawn: [],
+          finalBingoRound: false,
+          communityCards: [],
+          privateHands: {},
           players: createDefaultPlayers(),
           updatedAt: Date.now()
         });
       }
 
       if (mode === "mobile") {
-        const cleanName = name.trim() || `Jogador ${slot}`;
+        const cleanName = name.trim() || `Participante ${slot}`;
+        const existingPlayer = snap.exists() ? snap.data()?.players?.[slot] : null;
         await updateDoc(roomRef, {
           [`players.${slot}.active`]: true,
-          [`players.${slot}.name`]: cleanName
+          [`players.${slot}.name`]: cleanName,
+          [`players.${slot}.points`]: typeof existingPlayer?.points === "number" ? existingPlayer.points : INITIAL_POINTS,
+          [`players.${slot}.color`]: PLAYER_COLORS[slot],
+          [`players.${slot}.bingoCard`]: existingPlayer?.bingoCard || generateBingoCard()
         });
       }
 
       state.roomCode = cleanCode;
       state.mode = mode;
-      state.slot = slot;
-      state.playerName = name;
+      state.slot = slot ? Number(slot) : null;
+      state.playerName = name.trim() || `Participante ${slot}`;
+      state.enteredGame = false;
 
       lobbySection.classList.add("hidden");
       roomSection.classList.remove("hidden");
@@ -487,17 +777,20 @@
 
       if (mode === "tv") {
         roleLabel.textContent = "📺 MODO TV (APRESENTADOR)";
-        tvControlsCard.classList.remove("hidden");
+        myBalanceBadge.classList.add("hidden");
+        btnNewRoundReset.classList.remove("hidden");
+        preGameCalcCard.classList.add("hidden");
         tvActionArea.classList.remove("hidden");
-        mobileGuessArea.classList.add("hidden");
-        myScoreCard.classList.add("hidden");
+        mobileActionArea.classList.add("hidden");
+        gamesCardTitle.textContent = "🎮 Controle dos 8 Jogos (Modo TV)";
       } else {
-        roleLabel.textContent = `📱 CELULAR • JOGADOR ${slot}`;
-        tvControlsCard.classList.add("hidden");
+        roleLabel.textContent = `📱 MODO CELULAR • VAGA ${state.slot}`;
+        myBalanceBadge.classList.remove("hidden");
+        btnNewRoundReset.classList.add("hidden");
+        preGameCalcCard.classList.remove("hidden");
         tvActionArea.classList.add("hidden");
-        mobileGuessArea.classList.remove("hidden");
-        myScoreCard.classList.remove("hidden");
-        document.getElementById("mySlotTitle").textContent = `Jogador ${slot}`;
+        mobileActionArea.classList.remove("hidden");
+        gamesCardTitle.textContent = "📱 Escolha Seu Jogo (Antes de Entrar)";
       }
 
       if (state.unsubscribe) state.unsubscribe();
@@ -508,51 +801,272 @@
       });
     }
 
+    function getActiveGameId(data) {
+      if (state.mode === "tv") return data?.gameId || 1;
+      return state.chosenGameId || data?.gameId || 1;
+    }
+
+    function renderInteractiveGameBox(data, activeGameId) {
+      const players = data.players || createDefaultPlayers();
+      const me = state.slot ? players[state.slot] : null;
+
+      btnClearSelection.classList.add("hidden");
+      btnCallBingo.classList.add("hidden");
+      gameInteractiveBox.classList.add("hidden");
+      gameInteractiveBox.innerHTML = "";
+
+      // 2. CRAPS ou 3. ROLETA: seleção de até 5 números
+      if (activeGameId === 2 || activeGameId === 3) {
+        const minN = activeGameId === 2 ? 2 : 0;
+        const maxN = activeGameId === 2 ? 12 : 36;
+        gameInteractiveBox.classList.remove("hidden");
+
+        const title = document.createElement("div");
+        title.innerHTML = `<strong>${activeGameId === 2 ? "Tabela Craps (2 a 12)" : "Roleta (0 a 36)"}</strong> — Selecione até 5 números (cores de todos os participantes visíveis).`;
+        gameInteractiveBox.appendChild(title);
+
+        const grid = document.createElement("div");
+        grid.className = "num-grid";
+
+        for (let n = minN; n <= maxN; n++) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "num-btn";
+          btn.textContent = String(n);
+
+          // Quais participantes escolheram este número
+          const pickers = [];
+          for (let s = 1; s <= 7; s++) {
+            const p = players[s];
+            if (p && p.active && Array.isArray(p.selectedNumbers) && p.selectedNumbers.includes(n)) {
+              pickers.push(p);
+            }
+          }
+
+          if (me && Array.isArray(me.selectedNumbers) && me.selectedNumbers.includes(n)) {
+            btn.classList.add("selected");
+          }
+
+          if (pickers.length > 0) {
+            btn.style.boxShadow = `inset 0 -4px 0 ${pickers[0].color}`;
+          }
+
+          if (state.mode === "mobile" && state.slot) {
+            btn.onclick = async () => {
+              const currentSel = Array.isArray(me?.selectedNumbers) ? [...me.selectedNumbers] : [];
+              const idx = currentSel.indexOf(n);
+              if (idx >= 0) {
+                currentSel.splice(idx, 1);
+              } else {
+                if (currentSel.length >= 5) {
+                  alert("Você pode selecionar até 5 números.");
+                  return;
+                }
+                currentSel.push(n);
+              }
+              const roomRef = doc(db, "salas", state.roomCode);
+              await updateDoc(roomRef, {
+                [`players.${state.slot}.selectedNumbers`]: currentSel
+              });
+            };
+          } else {
+            btn.disabled = true;
+          }
+
+          grid.appendChild(btn);
+          if (pickers.length > 0) {
+            const dots = document.createElement("div");
+            dots.className = "row";
+            dots.style.gap = "3px";
+            dots.style.justifyContent = "center";
+            dots.style.marginTop = "4px";
+            pickers.forEach((pk) => {
+              const dot = document.createElement("span");
+              dot.className = "color-dot";
+              dot.style.background = pk.color;
+              dot.title = pk.name;
+              dots.appendChild(dot);
+            });
+            btn.appendChild(dots);
+          }
+        }
+
+        gameInteractiveBox.appendChild(grid);
+
+        if (state.mode === "mobile" && state.slot) {
+          btnClearSelection.classList.remove("hidden");
+          btnClearSelection.onclick = async () => {
+            const roomRef = doc(db, "salas", state.roomCode);
+            await updateDoc(roomRef, {
+              [`players.${state.slot}.selectedNumbers`]: []
+            });
+          };
+        }
+      }
+
+      // 4. PÔQUER: cartas privadas apenas no celular do respectivo participante
+      if (activeGameId === 4) {
+        gameInteractiveBox.classList.remove("hidden");
+        const comm = Array.isArray(data.communityCards) ? data.communityCards : [];
+        const commText = comm.length ? comm.join("  ") : "Aguardando distribuição da TV...";
+        let html = `<div><strong>Mesa Texas Hold'em (5 Comunitárias):</strong> ${commText}</div>`;
+        if (state.mode === "mobile" && state.slot) {
+          const myCards = data.privateHands?.[state.slot] || ["?", "?"];
+          html += `<div style="margin-top:8px; color:var(--neon);"><strong>Suas Cartas Privadas (Só no seu celular):</strong> ${myCards.join("  ")}</div>`;
+        } else {
+          html += `<div class="status-bar" style="margin-top:6px;">Cartas privadas ficam ocultas na TV e aparecem apenas no celular de cada participante.</div>`;
+        }
+        gameInteractiveBox.innerHTML = html;
+      }
+
+      // 6. BINGO: cartela individual por nome, 1 a 75, sorteio exclusivo pela TV
+      if (activeGameId === 6) {
+        gameInteractiveBox.classList.remove("hidden");
+        const drawn = Array.isArray(data.bingoDrawn) ? data.bingoDrawn : [];
+
+        if (state.mode === "mobile" && state.slot) {
+          const savedName = me?.bingoName || me?.name || "";
+          const cardGrid = Array.isArray(me?.bingoCard) ? me.bingoCard : generateBingoCard();
+          gameInteractiveBox.innerHTML = `
+            <div class="row" style="margin-bottom:8px;">
+              <input id="bingoNameInput" type="text" maxlength="16" value="${savedName}" placeholder="Seu nome na cartela" />
+              <button id="btnSaveBingoName" class="outline">Salvar Cartela</button>
+            </div>
+            <div class="status-bar">Números sorteados pela TV: <strong>${drawn.length ? drawn.join(", ") : "Nenhum ainda"}</strong></div>
+          `;
+
+          const cardEl = document.createElement("div");
+          cardEl.className = "bingo-card";
+          cardGrid.forEach((row) => {
+            row.forEach((cellVal) => {
+              const cell = document.createElement("div");
+              const isMarked = cellVal === "FREE" || state.markedBingo.includes(cellVal);
+              cell.className = "bingo-cell" + (isMarked ? " marked" : "");
+              cell.textContent = String(cellVal);
+              cell.onclick = () => {
+                if (cellVal === "FREE") return;
+                const idx = state.markedBingo.indexOf(cellVal);
+                if (idx >= 0) state.markedBingo.splice(idx, 1);
+                else state.markedBingo.push(cellVal);
+                renderRoom();
+              };
+              cardEl.appendChild(cell);
+            });
+          });
+          gameInteractiveBox.appendChild(cardEl);
+
+          document.getElementById("btnSaveBingoName").onclick = async () => {
+            const bName = document.getElementById("bingoNameInput").value.trim() || me.name;
+            const roomRef = doc(db, "salas", state.roomCode);
+            await updateDoc(roomRef, {
+              [`players.${state.slot}.bingoName`]: bName,
+              [`players.${state.slot}.bingoCard`]: cardGrid
+            });
+          };
+
+          btnCallBingo.classList.remove("hidden");
+          btnCallBingo.onclick = async () => {
+            const roomRef = doc(db, "salas", state.roomCode);
+            await updateDoc(roomRef, {
+              [`players.${state.slot}.bingoClaimed`]: true,
+              display: `🎉 BINGO ANUNCIADO POR ${me?.bingoName || me?.name}!`,
+              sub: `Marcados no celular: ${state.markedBingo.join(", ") || "nenhum"} — TV deve verificar a cartela.`
+            });
+          };
+        } else {
+          // Na TV: mostra sorteados e verificação de quem anunciou Bingo
+          const claims = [];
+          for (let s = 1; s <= 7; s++) {
+            if (players[s]?.bingoClaimed) {
+              claims.push(`${players[s].bingoName || players[s].name} (Vaga ${s})`);
+            }
+          }
+          gameInteractiveBox.innerHTML = `
+            <div><strong>Bolas Sorteadas (1 a 75 — sem repetição):</strong> ${drawn.length ? drawn.join(", ") : "Nenhuma"}</div>
+            <div style="margin-top:6px;"><strong>Verificação de Bingo:</strong> ${claims.length ? "Anunciou Bingo: " + claims.join(", ") : "Nenhum anúncio pendente."}</div>
+          `;
+        }
+      }
+    }
+
     function renderRoom() {
       const data = state.roomData;
       if (!data) return;
 
-      currentGameTitle.textContent = data.gameName || "LARGATIXA RICA";
-      arenaDisplay.textContent = data.display || "PRONTO";
+      const activeGameId = getActiveGameId(data);
+      const gameObj = GAMES.find((g) => g.id === activeGameId) || GAMES[0];
+      const players = data.players || createDefaultPlayers();
+
+      currentGameTitle.textContent = gameObj.name.toUpperCase();
+      arenaDisplay.textContent = data.display || "PRONTO PARA JOGAR!";
       arenaSub.textContent = data.sub || "";
 
-      // Renderiza botões dos 8 jogos no Modo TV
+      if (state.mode === "mobile" && state.slot) {
+        const me = players[state.slot];
+        const pts = typeof me?.points === "number" ? me.points : INITIAL_POINTS;
+        myBalanceBadge.textContent = `Saldo: ${pts} pts`;
+
+        const alreadyDrew = Array.isArray(me?.drawnGames) && me.drawnGames.includes(activeGameId);
+        const isBingo = activeGameId === 6;
+        const btnMobileDraw = document.getElementById("btnMobileDraw");
+        btnMobileDraw.disabled = isBingo || alreadyDrew;
+        btnMobileDraw.textContent = isBingo
+          ? "Bingo: somente a TV sorteia"
+          : (alreadyDrew ? "Sorteio já realizado neste jogo" : "🎲 Realizar Meu Sorteio (1x neste jogo)");
+      }
+
+      // Menu dos 8 jogos
       gamesMenu.innerHTML = "";
       GAMES.forEach((g) => {
         const btn = document.createElement("button");
-        btn.className = "outline" + (data.gameId === g.id ? " active" : "");
+        const isSelected = activeGameId === g.id;
+        btn.className = "outline" + (isSelected ? " active" : "");
         btn.textContent = g.name;
         btn.onclick = async () => {
-          const roomRef = doc(db, "salas", state.roomCode);
-          await updateDoc(roomRef, {
-            gameId: g.id,
-            gameName: g.name,
-            display: `${g.name.toUpperCase()} SELECIONADO`,
-            sub: "Jogadores: enviem seus palpites pelo celular e aguarde o sorteio!",
-            updatedAt: Date.now()
-          });
+          if (state.mode === "tv") {
+            const roomRef = doc(db, "salas", state.roomCode);
+            await updateDoc(roomRef, {
+              gameId: g.id,
+              gameName: g.name,
+              display: `${g.name.toUpperCase()} SELECIONADO`,
+              sub: "Rodada pronta na TV.",
+              updatedAt: Date.now()
+            });
+          } else {
+            state.chosenGameId = g.id;
+            state.enteredGame = true;
+            preGameCalcCard.classList.add("hidden");
+            renderRoom();
+          }
         };
         gamesMenu.appendChild(btn);
       });
 
-      // Renderiza os 7 slots de jogadores
+      renderInteractiveGameBox(data, activeGameId);
+
+      // Placar dos até 7 participantes
       playersBoard.innerHTML = "";
-      const players = data.players || createDefaultPlayers();
       for (let i = 1; i <= 7; i++) {
-        const p = players[i] || { active: false, name: `Vaga ${i}`, points: 100, guess: "" };
+        const p = players[i] || { active: false, name: `Participante ${i}`, points: INITIAL_POINTS, color: PLAYER_COLORS[i], selectedNumbers: [] };
         const box = document.createElement("div");
         box.className = "player-box" + (p.active ? " occupied" : "");
+        const selText = Array.isArray(p.selectedNumbers) && p.selectedNumbers.length
+          ? `Números: ${p.selectedNumbers.join(", ")}`
+          : "Sem números selecionados";
         box.innerHTML = `
-          <div class="player-slot">Celular #${i} • ${p.active ? "ONLINE" : "LIVRE"}</div>
+          <div class="player-slot">
+            <span class="color-dot" style="background:${p.color || PLAYER_COLORS[i]}"></span>
+            Vaga ${i} • ${p.active ? "ATIVO" : "LIVRE"}
+          </div>
           <div class="player-name">${p.name}</div>
-          <div class="player-points">${p.points} pts</div>
-          <div class="status-bar" style="margin-top:4px;">Palpite: <strong>${p.guess || "—"}</strong></div>
+          <div class="player-points">${p.points ?? INITIAL_POINTS} pts</div>
+          <div class="status-bar" style="margin-top:4px;">${selText}</div>
         `;
         playersBoard.appendChild(box);
       }
     }
 
-    // Eventos Lobby
+    // Lobby eventos
     document.getElementById("btnStartTV").onclick = () => {
       const code = document.getElementById("tvRoomInput").value || "LARG" + Math.floor(10 + Math.random() * 89);
       document.getElementById("tvRoomInput").value = code;
@@ -566,6 +1080,12 @@
       connectToRoom(code, "mobile", slot, name);
     };
 
+    document.getElementById("btnEnterSelectedGame").onclick = () => {
+      state.enteredGame = true;
+      preGameCalcCard.classList.add("hidden");
+      renderRoom();
+    };
+
     document.getElementById("btnLeaveRoom").onclick = () => {
       if (state.unsubscribe) state.unsubscribe();
       state.roomCode = null;
@@ -573,15 +1093,56 @@
       lobbySection.classList.remove("hidden");
     };
 
-    // Eventos TV
-    document.getElementById("btnTriggerRound").onclick = async () => {
+    // Controles da TV
+    document.getElementById("btnTvDraw").onclick = async () => {
       if (!state.roomData) return;
-      const currentGame = GAMES.find((g) => g.id === state.roomData.gameId) || GAMES[0];
-      const result = currentGame.run();
+      const gameId = state.roomData.gameId || 1;
+      const outcome = runGameDraw(gameId, state.roomData);
+      const roomRef = doc(db, "salas", state.roomCode);
+      const payload = {
+        display: outcome.display,
+        sub: outcome.sub,
+        updatedAt: Date.now()
+      };
+      if (outcome.bingoDrawn) payload.bingoDrawn = outcome.bingoDrawn;
+      if (outcome.communityCards) payload.communityCards = outcome.communityCards;
+      if (outcome.privateHands) payload.privateHands = outcome.privateHands;
+      await updateDoc(roomRef, payload);
+      arenaDisplay.classList.remove("spin-anim");
+      void arenaDisplay.offsetWidth;
+      arenaDisplay.classList.add("spin-anim");
+    };
+
+    document.getElementById("btnTvFinalBingo").onclick = async () => {
+      if (!state.roomData) return;
       const roomRef = doc(db, "salas", state.roomCode);
       await updateDoc(roomRef, {
-        display: result,
-        sub: `Rodada concluída às ${new Date().toLocaleTimeString("pt-BR")}`,
+        gameId: 6,
+        gameName: "6. Bingo",
+        finalBingoRound: true,
+        display: "🏆 RODADA FINAL ESPECIAL DO BINGO!",
+        sub: "Somente a TV sorteia os números decisivos.",
+        updatedAt: Date.now()
+      });
+    };
+
+    document.getElementById("btnNewRoundReset").onclick = async () => {
+      if (!state.roomData) return;
+      const updated = { ...state.roomData.players };
+      for (let i = 1; i <= 7; i++) {
+        if (updated[i]) {
+          updated[i].drawnGames = [];
+          updated[i].selectedNumbers = [];
+          updated[i].bingoClaimed = false;
+        }
+      }
+      const roomRef = doc(db, "salas", state.roomCode);
+      await updateDoc(roomRef, {
+        players: updated,
+        bingoDrawn: [],
+        finalBingoRound: false,
+        display: "NOVA RODADA INICIADA!",
+        sub: "Sorteios liberados para nova rodada.",
         updatedAt: Date.now()
       });
     };
@@ -591,70 +1152,54 @@
       const updated = { ...state.roomData.players };
       for (let i = 1; i <= 7; i++) {
         if (updated[i]) {
-          updated[i].points = 100;
-          updated[i].guess = "";
+          updated[i].points = INITIAL_POINTS;
+          updated[i].drawnGames = [];
+          updated[i].selectedNumbers = [];
+          updated[i].bingoClaimed = false;
         }
       }
       const roomRef = doc(db, "salas", state.roomCode);
-      await updateDoc(roomRef, { players: updated });
-    };
-
-    // Eventos Celular
-    document.getElementById("btnSendGuess").onclick = async () => {
-      const guess = document.getElementById("mobileGuessInput").value.trim();
-      if (!guess || !state.roomCode || !state.slot) return;
-      const roomRef = doc(db, "salas", state.roomCode);
       await updateDoc(roomRef, {
-        [`players.${state.slot}.guess`]: guess
+        players: updated,
+        bingoDrawn: [],
+        display: "PONTOS REINICIADOS (40 PTS)",
+        sub: "Cada participante voltou a 40 pontos fictícios."
       });
-      document.getElementById("mobileGuessInput").value = "";
     };
 
-    document.querySelectorAll(".score-delta").forEach((btn) => {
-      btn.onclick = async () => {
-        if (!state.roomData || !state.slot) return;
-        const delta = Number(btn.dataset.delta);
-        const current = Number(state.roomData.players?.[state.slot]?.points ?? 100);
-        const roomRef = doc(db, "salas", state.roomCode);
-        await updateDoc(roomRef, {
-          [`players.${state.slot}.points`]: Math.max(0, current + delta)
-        });
-      };
-    });
-
-    document.getElementById("btnSetManualScore").onclick = async () => {
-      const val = Number(document.getElementById("manualScoreInput").value);
-      if (Number.isNaN(val) || !state.roomCode || !state.slot) return;
-      const roomRef = doc(db, "salas", state.roomCode);
-      await updateDoc(roomRef, {
-        [`players.${state.slot}.points`]: Math.max(0, val)
-      });
-      document.getElementById("manualScoreInput").value = "";
-    };
-
-    // Calculadora Independente (100% local no aparelho)
-    let calcExpr = "";
-    const calcScreen = document.getElementById("calcScreen");
-    document.querySelectorAll(".calc-btn[data-val]").forEach((btn) => {
-      btn.onclick = () => {
-        calcExpr += btn.dataset.val;
-        calcScreen.textContent = calcExpr;
-      };
-    });
-    document.getElementById("calcClear").onclick = () => {
-      calcExpr = "";
-      calcScreen.textContent = "0";
-    };
-    document.getElementById("calcEq").onclick = () => {
-      try {
-        if (!/^[0-9+\-*/.() ]+$/.test(calcExpr)) return;
-        const res = Function(`"use strict"; return (${calcExpr})`)();
-        calcExpr = String(Number.isFinite(res) ? Number(res.toFixed(4)) : 0);
-        calcScreen.textContent = calcExpr;
-      } catch {
-        calcExpr = "";
-        calcScreen.textContent = "Erro";
+    // Sorteio individual do Celular (1 sorteio por jogo por participante)
+    document.getElementById("btnMobileDraw").onclick = async () => {
+      if (!state.roomData || !state.slot) return;
+      const gameId = getActiveGameId(state.roomData);
+      if (gameId === 6) {
+        alert("No Bingo, somente a TV pode sortear números.");
+        return;
       }
+
+      const me = state.roomData.players?.[state.slot];
+      const drawnGames = Array.isArray(me?.drawnGames) ? [...me.drawnGames] : [];
+      if (drawnGames.includes(gameId)) {
+        alert("Você já realizou seu sorteio neste jogo.");
+        return;
+      }
+
+      drawnGames.push(gameId);
+      const outcome = runGameDraw(gameId, state.roomData);
+      const gameObj = GAMES.find((g) => g.id === gameId) || GAMES[0];
+      const roomRef = doc(db, "salas", state.roomCode);
+
+      const payload = {
+        [`players.${state.slot}.drawnGames`]: drawnGames,
+        gameId,
+        gameName: gameObj.name,
+        display: outcome.display,
+        sub: `${me?.name || "Participante " + state.slot} jogou ${gameObj.name}: ${outcome.sub}`,
+        updatedAt: Date.now()
+      };
+      if (outcome.communityCards) payload.communityCards = outcome.communityCards;
+      if (outcome.privateHands) payload.privateHands = outcome.privateHands;
+
+      await updateDoc(roomRef, payload);
     };
   </script>
 </body>
