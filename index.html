@@ -2,1218 +2,321 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LARGATIXA RICA — Arcade Recreativo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>LARGATIXA RICA</title>
   <style>
     :root {
-      --bg: #050505;
-      --card: #0f0f0f;
-      --card-2: #161616;
-      --neon: #39ff14;
-      --neon-dim: rgba(57, 255, 20, 0.16);
-      --text: #f3f3f3;
-      --muted: #9aa09a;
-      --danger: #ff4d4d;
+      --bg: #070b08;
+      --surface: #0e1510;
+      --surface-2: #141f17;
+      --border: #1e3324;
+      --neon: #22ff66;
+      --neon-soft: rgba(34, 255, 102, 0.14);
+      --neon-glow: 0 0 18px rgba(34, 255, 102, 0.28);
+      --text: #f2fff6;
+      --muted: #8ca694;
+      --accent-blue: #38bdf8;
+      --accent-amber: #fbbf24;
+      --accent-rose: #fb7185;
     }
 
-    * { box-sizing: border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      background: var(--bg);
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(34, 255, 102, 0.08), transparent 45%),
+        var(--bg);
       color: var(--text);
       min-height: 100vh;
+      line-height: 1.45;
+      padding: 14px;
+      padding-bottom: 54px;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
     }
 
     header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--neon-glow);
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 16px 20px;
-      border-bottom: 1px solid #1e1e1e;
-      background: #080808;
+      flex-wrap: wrap;
     }
 
-    .brand {
+    .title {
       font-size: 1.4rem;
       font-weight: 900;
-      letter-spacing: 1.5px;
       color: var(--neon);
-      text-shadow: 0 0 12px rgba(57, 255, 20, 0.45);
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 14px rgba(34, 255, 102, 0.35);
     }
 
-    .badge {
-      font-size: 0.78rem;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--neon);
-      color: var(--neon);
-      background: var(--neon-dim);
+    .sub {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-top: 2px;
     }
 
-    main {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 20px;
+    .mode-switch {
+      display: flex;
+      gap: 8px;
+    }
+
+    .mode-btn {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mode-btn.active {
+      background: var(--neon);
+      color: #051108;
+      border-color: var(--neon);
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid #222;
-      border-radius: 14px;
-      padding: 18px;
-      margin-bottom: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
     }
 
-    h2, h3 {
-      margin-top: 0;
-      color: var(--neon);
+    .view-section {
+      display: none;
     }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 16px;
+    .view-section.active {
+      display: block;
     }
 
-    .grid-games {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    .player-bar {
+      display: flex;
       gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
     }
 
-    input, select, button {
-      font-size: 1rem;
-      border-radius: 10px;
-      padding: 11px 14px;
-      border: 1px solid #2c2c2c;
-      background: var(--card-2);
+    input, select {
+      background: var(--surface-2);
       color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
     }
 
     input:focus, select:focus {
-      outline: none;
       border-color: var(--neon);
+      box-shadow: 0 0 0 2px rgba(34, 255, 102, 0.16);
     }
 
-    button {
-      cursor: pointer;
-      font-weight: 700;
-      transition: 0.15s ease;
-    }
-
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    button.primary {
-      background: var(--neon);
-      color: #050505;
-      border-color: var(--neon);
-    }
-
-    button.primary:hover:not(:disabled) {
-      filter: brightness(1.08);
-      box-shadow: 0 0 14px rgba(57, 255, 20, 0.4);
-    }
-
-    button.outline {
-      border-color: var(--neon);
-      color: var(--neon);
-      background: transparent;
-    }
-
-    button.outline.active, button.outline:hover:not(:disabled) {
-      background: var(--neon);
-      color: #050505;
-    }
-
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .hidden { display: none !important; }
-
-    .players-grid {
+    .games-tabs {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
+      margin-bottom: 14px;
     }
 
-    .player-box {
-      background: var(--card-2);
-      border: 1px solid #262626;
+    @media (min-width: 640px) {
+      .games-tabs {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .g-btn {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 12px;
-    }
-
-    .player-box.occupied {
-      border-color: rgba(57, 255, 20, 0.55);
-    }
-
-    .player-slot {
-      font-size: 0.78rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .color-dot {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      display: inline-block;
-      border: 1px solid #fff;
-    }
-
-    .player-name {
-      font-size: 1.05rem;
+      padding: 11px 10px;
+      font-size: 0.84rem;
       font-weight: 800;
-      margin: 4px 0;
-    }
-
-    .player-points {
-      font-size: 1.35rem;
-      font-weight: 900;
-      color: var(--neon);
-    }
-
-    .arena {
-      background: #090909;
-      border: 1px solid var(--neon);
-      border-radius: 14px;
-      padding: 18px;
+      cursor: pointer;
       text-align: center;
     }
 
-    .big-display {
-      font-size: clamp(1.35rem, 3.2vw, 2.2rem);
-      font-weight: 900;
+    .g-btn.active {
+      background: var(--neon-soft);
       color: var(--neon);
-      margin: 14px 0;
-      letter-spacing: 0.8px;
-      min-height: 44px;
+      border-color: var(--neon);
+      box-shadow: 0 0 12px rgba(34, 255, 102, 0.2);
     }
 
-    .spin-anim {
-      animation: pulseNeon 0.35s ease-in-out 2;
+    .game-panel {
+      display: none;
     }
 
-    @keyframes pulseNeon {
-      0% { transform: scale(0.97); opacity: 0.6; }
-      50% { transform: scale(1.03); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
+    .game-panel.active {
+      display: block;
+    }
+
+    .game-panel h2 {
+      color: var(--neon);
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .game-panel p {
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-bottom: 12px;
     }
 
     .num-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: 6px;
+      margin: 10px 0;
+    }
+
+    @media (min-width: 640px) {
+      .num-grid.wide {
+        grid-template-columns: repeat(10, 1fr);
+      }
+    }
+
+    .n-btn {
+      min-height: 44px;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .n-btn.sel {
+      background: var(--neon);
+      color: #051108;
+      border-color: var(--neon);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
       margin-top: 10px;
     }
 
-    .num-btn {
-      padding: 8px 4px;
-      font-size: 0.9rem;
-      background: #141414;
-      border: 1px solid #2e2e2e;
-      color: var(--text);
-    }
-
-    .num-btn.selected {
+    button.primary {
       background: var(--neon);
-      color: #050505;
-      border-color: var(--neon);
-      font-weight: 800;
+      color: #051108;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 0.86rem;
+      font-weight: 900;
+      cursor: pointer;
     }
 
-    .bingo-card {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
-      max-width: 290px;
-      margin: 10px auto;
+    button.primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
 
-    .bingo-cell {
-      padding: 9px 4px;
-      border-radius: 8px;
-      background: #151515;
-      border: 1px solid #333;
+    button.sec {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.84rem;
       font-weight: 700;
       cursor: pointer;
     }
 
-    .bingo-cell.marked {
-      background: var(--neon);
-      color: #050505;
-      border-color: var(--neon);
-    }
-
-    .table-box {
-      background: #111;
-      border: 1px solid #252525;
-      border-radius: 12px;
-      padding: 12px;
+    .out-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
       margin-top: 12px;
-      text-align: left;
+      min-height: 64px;
+      white-space: pre-line;
+      font-size: 0.92rem;
     }
 
-    .calc-screen {
-      background: #050505;
-      border: 1px solid var(--neon);
-      color: var(--neon);
-      font-size: 1.5rem;
+    .tv-big {
+      text-align: center;
+      padding: 24px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-top: 12px;
+    }
+
+    .tv-num {
+      font-size: 3rem;
       font-weight: 900;
-      text-align: right;
-      padding: 12px 14px;
-      border-radius: 10px;
-      margin-bottom: 10px;
-      max-width: 360px;
+      color: var(--neon);
+      line-height: 1.1;
     }
 
-    .calc-steps {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      max-width: 360px;
-      margin-bottom: 8px;
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--neon);
+      color: #051108;
+      font-weight: 800;
+      font-size: 0.84rem;
+      padding: 10px 18px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.2s ease;
+      z-index: 999;
     }
 
-    .status-bar {
-      font-size: 0.9rem;
-      color: var(--muted);
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">🦎 LARGATIXA RICA</div>
-    <div class="row">
-      <span class="badge">100% RECREATIVO • SEM DINHEIRO REAL</span>
-      <span id="connStatus" class="badge">Conectando...</span>
-    </div>
-  </header>
-
-  <main>
-    <section id="lobbySection" class="card">
-      <h2>LARGATIXA RICA — Escolha o Modo</h2>
-      <p class="status-bar">Visual preto e verde neon recreativo. Use o mesmo <strong>Código da Sala</strong> na TV e em até 7 celulares.</p>
-
-      <div class="grid-2">
-        <div class="card">
-          <h3>📺 Modo TV (Apresentador)</h3>
-          <p class="status-bar">Exclusivo para o apresentador. Controla todos os jogos, sorteios ilimitados e resultados. Sem cadastro como jogador.</p>
-          <div class="row" style="margin-bottom:12px;">
-            <input id="tvRoomInput" type="text" maxlength="8" placeholder="Código (ex: LARG77)" style="text-transform:uppercase" />
-            <button id="btnStartTV" type="button" class="primary">Abrir Modo TV</button>
-          </div>
-
-          <div style="margin-top:12px; padding-top:12px; border-top:1px solid #222;">
-            <div class="status-bar" style="margin-bottom:6px;"><strong>🧮 Calculadora da TV (Independente)</strong></div>
-            <div id="lobbyTvCalcScreen" class="calc-screen">0</div>
-            <div class="calc-steps">
-              <button type="button" class="outline calc-add" data-calc="lobbyTv" data-val="1">+1</button>
-              <button type="button" class="outline calc-add" data-calc="lobbyTv" data-val="5">+5</button>
-              <button type="button" class="outline calc-add" data-calc="lobbyTv" data-val="10">+10</button>
-              <button type="button" class="outline calc-add" data-calc="lobbyTv" data-val="25">+25</button>
-            </div>
-            <div class="calc-steps">
-              <button type="button" class="outline calc-undo" data-calc="lobbyTv">Desfazer</button>
-              <button type="button" class="outline calc-zero" data-calc="lobbyTv" style="color:var(--danger); border-color:var(--danger);">Zerar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>📱 Modo Celular (Até 7 Participantes)</h3>
-          <p class="status-bar">Cada participante começa com <strong>40 pontos fictícios</strong>, escolhe seu próprio jogo e vê seu saldo. A calculadora aparece antes de entrar em um jogo.</p>
-          <div class="row" style="margin-bottom:10px;">
-            <input id="mobileRoomInput" type="text" maxlength="8" placeholder="Código da Sala" style="text-transform:uppercase" />
-            <select id="slotSelect">
-              <option value="1">Participante 1</option>
-              <option value="2">Participante 2</option>
-              <option value="3">Participante 3</option>
-              <option value="4">Participante 4</option>
-              <option value="5">Participante 5</option>
-              <option value="6">Participante 6</option>
-              <option value="7">Participante 7</option>
-            </select>
-          </div>
-          <div class="row">
-            <input id="playerNameInput" type="text" maxlength="16" placeholder="Nome / Apelido" />
-            <button id="btnJoinMobile" type="button" class="primary">Entrar no Celular</button>
-          </div>
-          <div id="mobileFeedback" class="status-bar" style="margin-top:8px; color:var(--neon);"></div>
-        </div>
+  <div class="wrap">
+    <header>
+      <div>
+        <div class="title">LARGATIXA RICA</div>
+        <div id="header-sub" class="sub">Modo Celular • Todos os 8 jogos liberados</div>
       </div>
-    </section>
-
-    <section id="roomSection" class="hidden">
-      <div class="card row" style="justify-content:space-between;">
-        <div>
-          <strong style="color:var(--neon); font-size:1.15rem;">SALA: <span id="activeRoomCode">---</span></strong>
-          <span id="roleLabel" class="badge" style="margin-left:8px;">---</span>
-          <span id="myBalanceBadge" class="badge hidden" style="margin-left:8px;">Saldo: 40 pts</span>
-        </div>
-        <div class="row">
-          <button id="btnNewRoundReset" type="button" class="outline hidden">Nova Rodada</button>
-          <button id="btnLeaveRoom" type="button" class="outline">Sair da Sala</button>
-        </div>
+      <div class="mode-switch">
+        <button type="button" id="btn-mode-celular" class="mode-btn active" onclick="trocarModo('celular')">Modo Celular</button>
+        <button type="button" id="btn-mode-tv" class="mode-btn" onclick="trocarModo('tv')">Modo TV</button>
       </div>
-
-      <div id="preGameCalcCard" class="card hidden">
-        <h3>🧮 Calculadora Independente (Antes de Entrar no Jogo)</h3>
-        <p class="status-bar">Exclusiva do seu aparelho. Ajuste seus valores e toque em <strong>Entrar no Jogo</strong>.</p>
-        <div id="mobileCalcScreen" class="calc-screen">0</div>
-        <div class="calc-steps">
-          <button type="button" class="outline calc-add" data-calc="mobile" data-val="1">+1</button>
-          <button type="button" class="outline calc-add" data-calc="mobile" data-val="5">+5</button>
-          <button type="button" class="outline calc-add" data-calc="mobile" data-val="10">+10</button>
-          <button type="button" class="outline calc-add" data-calc="mobile" data-val="25">+25</button>
-        </div>
-        <div class="calc-steps">
-          <button type="button" class="outline calc-undo" data-calc="mobile">Desfazer</button>
-          <button type="button" class="outline calc-zero" data-calc="mobile" style="color:var(--danger); border-color:var(--danger);">Zerar</button>
-          <button id="btnEnterSelectedGame" type="button" class="primary">Entrar no Jogo</button>
-        </div>
-      </div>
-
-      <div id="gamesCard" class="card">
-        <h3 id="gamesCardTitle">🎮 Os 8 Jogos Recreativos</h3>
-        <div id="gamesMenu" class="grid-games"></div>
-      </div>
-
-      <div class="card arena">
-        <div class="badge" id="currentGameTitle">1. CAÇA-NÍQUEL</div>
-        <div id="arenaDisplay" class="big-display">PRONTO PARA JOGAR!</div>
-        <p id="arenaSub" class="status-bar">Aguardando rodada...</p>
-
-        <div id="gameInteractiveBox" class="table-box hidden"></div>
-
-        <div id="tvActionArea" class="row hidden" style="justify-content:center; margin-top:14px;">
-          <button id="btnTvDraw" type="button" class="primary">⚡ Sortear / Rodar (TV)</button>
-          <button id="btnTvFinalBingo" type="button" class="outline">🏆 Rodada Final Especial (Bingo)</button>
-          <button id="btnResetScores" type="button" class="outline">Reiniciar Pontos (40 pts)</button>
-        </div>
-
-        <div id="mobileActionArea" class="row hidden" style="justify-content:center; margin-top:14px;">
-          <button id="btnMobileDraw" type="button" class="primary">🎲 Realizar Meu Sorteio (1x neste jogo)</button>
-          <button id="btnClearSelection" type="button" class="outline hidden">Limpar Seleção</button>
-          <button id="btnCallBingo" type="button" class="outline hidden">🎉 Anunciar Bingo!</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>🏆 Participantes e Saldos Recreativos (Até 7)</h3>
-        <div id="playersBoard" class="players-grid"></div>
-      </div>
-    </section>
-  </main>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      getDoc,
-      updateDoc,
-      onSnapshot
-    } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDVYckHUaYMA4RmHFxu7Nwym6eAmvjydrI",
-      authDomain: "largatixa-rica-c055a.firebaseapp.com",
-      projectId: "largatixa-rica-c055a",
-      storageBucket: "largatixa-rica-c055a.firebasestorage.app",
-      messagingSenderId: "94911537324",
-      appId: "1:94911537324:web:9fadc8a135ff77af4fff09"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const connStatus = document.getElementById("connStatus");
-    connStatus.textContent = "Firebase Online";
-
-    const INITIAL_POINTS = 40;
-    const PLAYER_COLORS = {
-      1: "#39ff14",
-      2: "#00e5ff",
-      3: "#ffd600",
-      4: "#ff4081",
-      5: "#ff9100",
-      6: "#b388ff",
-      7: "#64ffda"
-    };
-
-    const GAMES = [
-      { id: 1, name: "1. Caça-níquel" },
-      { id: 2, name: "2. Craps" },
-      { id: 3, name: "3. Roleta" },
-      { id: 4, name: "4. Pôquer" },
-      { id: 5, name: "5. Corrida de Cavalos" },
-      { id: 6, name: "6. Bingo" },
-      { id: 7, name: "7. Blackjack (21)" },
-      { id: 8, name: "8. Baccarat" }
-    ];
-
-    const DECK_CARDS = [
-      "A♠", "2♠", "3♠", "4♠", "5♠", "6♠", "7♠", "8♠", "9♠", "10♠", "J♠", "Q♠", "K♠",
-      "A♥", "2♥", "3♥", "4♥", "5♥", "6♥", "7♥", "8♥", "9♥", "10♥", "J♥", "Q♥", "K♥",
-      "A♦", "2♦", "3♦", "4♦", "5♦", "6♦", "7♦", "8♦", "9♦", "10♦", "J♦", "Q♦", "K♦",
-      "A♣", "2♣", "3♣", "4♣", "5♣", "6♣", "7♣", "8♣", "9♣", "10♣", "J♣", "Q♣", "K♣"
-    ];
-
-    function pickRandom(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
-
-    function drawCards(count) {
-      const pool = [...DECK_CARDS];
-      const out = [];
-      for (let i = 0; i < count && pool.length > 0; i++) {
-        const idx = Math.floor(Math.random() * pool.length);
-        out.push(pool.splice(idx, 1)[0]);
-      }
-      return out;
-    }
-
-    function generateBingoCard() {
-      const cols = [
-        [1, 15],
-        [16, 30],
-        [31, 45],
-        [46, 60],
-        [61, 75]
-      ];
-      const cardCols = [];
-      for (let c = 0; c < 5; c++) {
-        const [min, max] = cols[c];
-        const nums = [];
-        while (nums.length < 5) {
-          const n = Math.floor(Math.random() * (max - min + 1)) + min;
-          if (!nums.includes(n)) nums.push(n);
-        }
-        cardCols.push(nums);
-      }
-      const rows = [];
-      for (let r = 0; r < 5; r++) {
-        const row = [];
-        for (let c = 0; c < 5; c++) {
-          row.push(r === 2 && c === 2 ? "FREE" : cardCols[c][r]);
-        }
-        rows.push(row);
-      }
-      return rows;
-    }
-
-    function runGameDraw(gameId, roomData) {
-      if (gameId === 1) {
-        const syms = ["🦎", "💎", "🍀", "⭐", "🔔", "7️⃣"];
-        const r1 = pickRandom(syms);
-        const r2 = pickRandom(syms);
-        const r3 = pickRandom(syms);
-        const match = r1 === r2 && r2 === r3 ? " — TRINCA NEON!" : (r1 === r2 || r2 === r3 || r1 === r3 ? " — PAR RECREATIVO!" : "");
-        return {
-          display: `[ ${r1} ]  [ ${r2} ]  [ ${r3} ]`,
-          sub: `Caça-níquel (3 rolos)${match}`
-        };
-      }
-
-      if (gameId === 2) {
-        const d1 = Math.floor(Math.random() * 6) + 1;
-        const d2 = Math.floor(Math.random() * 6) + 1;
-        const sum = d1 + d2;
-        return {
-          display: `🎲 ${d1} + ${d2} = ${sum}`,
-          sub: `Craps: número sorteado ${sum} (tabela 2 a 12)`
-        };
-      }
-
-      if (gameId === 3) {
-        const num = Math.floor(Math.random() * 37);
-        const color = num === 0 ? "VERDE NEON" : (num % 2 === 0 ? "PRETO" : "VERDE");
-        return {
-          display: `🎡 NÚMERO ${num} (${color})`,
-          sub: `Roleta de 0 a 36 — resultado compartilhado para todos`
-        };
-      }
-
-      if (gameId === 4) {
-        const comm = drawCards(5);
-        const privateHands = {};
-        for (let i = 1; i <= 7; i++) {
-          privateHands[i] = drawCards(2);
-        }
-        return {
-          display: `🃏 Mesa: ${comm.join("  ")}`,
-          sub: "Texas Hold'em: 5 cartas comunitárias na mesa e 2 cartas privadas enviadas a cada celular.",
-          communityCards: comm,
-          privateHands
-        };
-      }
-
-      if (gameId === 5) {
-        const horses = ["🐎 Trovão", "⚡ Relâmpago", "🌪️ Furacão", "🌑 Sombra", "⭐ Estrela", "🔥 Cometa"];
-        const order = [...horses].sort(() => Math.random() - 0.5);
-        return {
-          display: `🏁 VENCEDOR: ${order[0]}`,
-          sub: `Largada e chegada: 1º ${order[0]} • 2º ${order[1]} • 3º ${order[2]}`
-        };
-      }
-
-      if (gameId === 6) {
-        const drawn = Array.isArray(roomData?.bingoDrawn) ? [...roomData.bingoDrawn] : [];
-        const available = [];
-        for (let n = 1; n <= 75; n++) {
-          if (!drawn.includes(n)) available.push(n);
-        }
-        if (available.length === 0) {
-          return {
-            display: "BINGO COMPLETO (1–75)",
-            sub: "Todos os 75 números já foram sorteados nesta rodada.",
-            bingoDrawn: drawn
-          };
-        }
-        const nextNum = pickRandom(available);
-        drawn.push(nextNum);
-        return {
-          display: `🎱 BOLA ${nextNum} (Total sorteados: ${drawn.length}/75)`,
-          sub: `Números sorteados: ${drawn.join(", ")}`,
-          bingoDrawn: drawn
-        };
-      }
-
-      if (gameId === 7) {
-        const pHand = drawCards(2);
-        const dHand = drawCards(2);
-        return {
-          display: `🃏 Mão: ${pHand.join(" ")}  |  Banca: ${dHand.join(" ")}`,
-          sub: "Blackjack (21) recreativo — distribuição de cartas concluída"
-        };
-      }
-
-      const playerHand = drawCards(2);
-      const bankerHand = drawCards(2);
-      const winner = Math.random() < 0.45 ? "JOGADOR" : (Math.random() < 0.85 ? "BANCA" : "EMPATE");
-      return {
-        display: `🂠 Jogador: ${playerHand.join(" ")} vs Banca: ${bankerHand.join(" ")}`,
-        sub: `Baccarat recreativo — Resultado: ${winner}`
-      };
-    }
-
-    function createDefaultPlayers() {
-      const p = {};
-      for (let i = 1; i <= 7; i++) {
-        p[i] = {
-          active: false,
-          name: `Participante ${i}`,
-          points: INITIAL_POINTS,
-          color: PLAYER_COLORS[i],
-          selectedNumbers: [],
-          drawnGames: [],
-          bingoName: "",
-          bingoCard: generateBingoCard(),
-          bingoClaimed: false
-        };
-      }
-      return p;
-    }
-
-    function createDefaultRoomDoc() {
-      return {
-        gameId: 1,
-        gameName: GAMES[0].name,
-        display: "LARGATIXA RICA — SALA PRONTA",
-        sub: "TV controla todos os jogos e sorteios; celulares participam com 40 pontos recreativos.",
-        bingoDrawn: [],
-        finalBingoRound: false,
-        communityCards: [],
-        privateHands: {},
-        players: createDefaultPlayers(),
-        updatedAt: Date.now()
-      };
-    }
-
-    let state = {
-      roomCode: null,
-      mode: null,
-      slot: null,
-      playerName: null,
-      chosenGameId: 1,
-      enteredGame: false,
-      unsubscribe: null,
-      roomData: createDefaultRoomDoc(),
-      markedBingo: [],
-      calcs: {
-        lobbyTv: { value: 0, history: [] },
-        mobile: { value: 0, history: [] }
-      }
-    };
-
-    const lobbySection = document.getElementById("lobbySection");
-    const roomSection = document.getElementById("roomSection");
-    const mobileFeedback = document.getElementById("mobileFeedback");
-    const activeRoomCode = document.getElementById("activeRoomCode");
-    const roleLabel = document.getElementById("roleLabel");
-    const myBalanceBadge = document.getElementById("myBalanceBadge");
-    const btnNewRoundReset = document.getElementById("btnNewRoundReset");
-    const preGameCalcCard = document.getElementById("preGameCalcCard");
-    const gamesCardTitle = document.getElementById("gamesCardTitle");
-    const gamesMenu = document.getElementById("gamesMenu");
-    const currentGameTitle = document.getElementById("currentGameTitle");
-    const arenaDisplay = document.getElementById("arenaDisplay");
-    const arenaSub = document.getElementById("arenaSub");
-    const gameInteractiveBox = document.getElementById("gameInteractiveBox");
-    const tvActionArea = document.getElementById("tvActionArea");
-    const mobileActionArea = document.getElementById("mobileActionArea");
-    const btnClearSelection = document.getElementById("btnClearSelection");
-    const btnCallBingo = document.getElementById("btnCallBingo");
-    const playersBoard = document.getElementById("playersBoard");
-
-    function updateCalcUI(key) {
-      const calc = state.calcs[key];
-      const el = key === "lobbyTv"
-        ? document.getElementById("lobbyTvCalcScreen")
-        : document.getElementById("mobileCalcScreen");
-      if (el) el.textContent = String(calc.value);
-    }
-
-    document.querySelectorAll(".calc-add").forEach((btn) => {
-      btn.onclick = () => {
-        const key = btn.dataset.calc;
-        const delta = Number(btn.dataset.val);
-        const calc = state.calcs[key];
-        calc.history.push(calc.value);
-        calc.value += delta;
-        updateCalcUI(key);
-      };
-    });
-
-    document.querySelectorAll(".calc-undo").forEach((btn) => {
-      btn.onclick = () => {
-        const key = btn.dataset.calc;
-        const calc = state.calcs[key];
-        if (calc.history.length > 0) {
-          calc.value = calc.history.pop();
-          updateCalcUI(key);
-        }
-      };
-    });
-
-    document.querySelectorAll(".calc-zero").forEach((btn) => {
-      btn.onclick = () => {
-        const key = btn.dataset.calc;
-        const calc = state.calcs[key];
-        calc.history.push(calc.value);
-        calc.value = 0;
-        updateCalcUI(key);
-      };
-    });
-
-    function openRoomUI(cleanCode, mode, slotNum, cleanName, initialData) {
-      state.roomCode = cleanCode;
-      state.mode = mode;
-      state.slot = slotNum;
-      state.playerName = cleanName;
-      state.enteredGame = false;
-      state.roomData = initialData || createDefaultRoomDoc();
-
-      lobbySection.classList.add("hidden");
-      roomSection.classList.remove("hidden");
-      activeRoomCode.textContent = cleanCode;
-
-      if (mode === "tv") {
-        roleLabel.textContent = "📺 MODO TV (APRESENTADOR)";
-        myBalanceBadge.classList.add("hidden");
-        btnNewRoundReset.classList.remove("hidden");
-        preGameCalcCard.classList.add("hidden");
-        tvActionArea.classList.remove("hidden");
-        mobileActionArea.classList.add("hidden");
-        gamesCardTitle.textContent = "🎮 Controle dos 8 Jogos (Modo TV)";
-      } else {
-        roleLabel.textContent = `📱 MODO CELULAR • VAGA ${slotNum}`;
-        myBalanceBadge.classList.remove("hidden");
-        btnNewRoundReset.classList.add("hidden");
-        preGameCalcCard.classList.remove("hidden");
-        tvActionArea.classList.add("hidden");
-        mobileActionArea.classList.remove("hidden");
-        gamesCardTitle.textContent = "📱 Escolha Seu Jogo (Antes de Entrar)";
-      }
-
-      renderRoom();
-    }
-
-    async function connectToRoom(code, mode, slot = null, name = "") {
-      const cleanCode = (code || "").trim().toUpperCase();
-      if (!cleanCode) {
-        if (mobileFeedback) mobileFeedback.textContent = "Digite um código de sala (ex: LARG77).";
-        alert("Digite um código de sala (ex: LARG77).");
-        return;
-      }
-
-      const slotNum = slot ? Number(slot) : null;
-      const cleanName = (name || "").trim() || `Participante ${slotNum}`;
-      const fallbackData = createDefaultRoomDoc();
-
-      if (mode === "mobile" && slotNum) {
-        fallbackData.players[slotNum] = {
-          ...fallbackData.players[slotNum],
-          active: true,
-          name: cleanName,
-          points: INITIAL_POINTS
-        };
-      }
-
-      // Abre a tela da sala imediatamente para nunca travar o botão do celular
-      openRoomUI(cleanCode, mode, slotNum, cleanName, fallbackData);
-
-      const roomRef = doc(db, "salas", cleanCode);
-
-      try {
-        const snap = await getDoc(roomRef);
-        let currentData = snap.exists() ? snap.data() : createDefaultRoomDoc();
-
-        if (!snap.exists()) {
-          await setDoc(roomRef, currentData);
-        }
-
-        if (mode === "mobile" && slotNum) {
-          const existingPlayer = currentData?.players?.[slotNum];
-          const mergedPlayers = {
-            ...createDefaultPlayers(),
-            ...(currentData?.players || {}),
-            [slotNum]: {
-              active: true,
-              name: cleanName,
-              points: typeof existingPlayer?.points === "number" ? existingPlayer.points : INITIAL_POINTS,
-              color: PLAYER_COLORS[slotNum],
-              selectedNumbers: Array.isArray(existingPlayer?.selectedNumbers) ? existingPlayer.selectedNumbers : [],
-              drawnGames: Array.isArray(existingPlayer?.drawnGames) ? existingPlayer.drawnGames : [],
-              bingoName: existingPlayer?.bingoName || cleanName,
-              bingoCard: Array.isArray(existingPlayer?.bingoCard) ? existingPlayer.bingoCard : generateBingoCard(),
-              bingoClaimed: Boolean(existingPlayer?.bingoClaimed)
-            }
-          };
-
-          await setDoc(roomRef, {
-            players: mergedPlayers,
-            updatedAt: Date.now()
-          }, { merge: true });
-        }
-
-        if (state.unsubscribe) state.unsubscribe();
-        state.unsubscribe = onSnapshot(roomRef, (docSnap) => {
-          if (!docSnap.exists()) return;
-          state.roomData = docSnap.data();
-          renderRoom();
-        });
-      } catch (err) {
-        console.error(err);
-        arenaSub.textContent = "Modo local ativo (verifique regras/conexão do Firestore para sincronizar em tempo real).";
-      }
-    }
-
-    function getActiveGameId(data) {
-      if (state.mode === "tv") return data?.gameId || 1;
-      return state.chosenGameId || data?.gameId || 1;
-    }
-
-    function renderInteractiveGameBox(data, activeGameId) {
-      const players = data.players || createDefaultPlayers();
-      const me = state.slot ? players[state.slot] : null;
-
-      btnClearSelection.classList.add("hidden");
-      btnCallBingo.classList.add("hidden");
-      gameInteractiveBox.classList.add("hidden");
-      gameInteractiveBox.innerHTML = "";
-
-      if (activeGameId === 2 || activeGameId === 3) {
-        const minN = activeGameId === 2 ? 2 : 0;
-        const maxN = activeGameId === 2 ? 12 : 36;
-        gameInteractiveBox.classList.remove("hidden");
-
-        const title = document.createElement("div");
-        title.innerHTML = `<strong>${activeGameId === 2 ? "Tabela Craps (2 a 12)" : "Roleta (0 a 36)"}</strong> — Selecione até 5 números (cores de todos os participantes visíveis).`;
-        gameInteractiveBox.appendChild(title);
-
-        const grid = document.createElement("div");
-        grid.className = "num-grid";
-
-        for (let n = minN; n <= maxN; n++) {
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "num-btn";
-          btn.textContent = String(n);
-
-          const pickers = [];
-          for (let s = 1; s <= 7; s++) {
-            const p = players[s];
-            if (p && p.active && Array.isArray(p.selectedNumbers) && p.selectedNumbers.includes(n)) {
-              pickers.push(p);
-            }
-          }
-
-          if (me && Array.isArray(me.selectedNumbers) && me.selectedNumbers.includes(n)) {
-            btn.classList.add("selected");
-          }
-
-          if (pickers.length > 0) {
-            btn.style.boxShadow = `inset 0 -4px 0 ${pickers[0].color}`;
-          }
-
-          if (state.mode === "mobile" && state.slot) {
-            btn.onclick = async () => {
-              const currentSel = Array.isArray(me?.selectedNumbers) ? [...me.selectedNumbers] : [];
-              const idx = currentSel.indexOf(n);
-              if (idx >= 0) {
-                currentSel.splice(idx, 1);
-              } else {
-                if (currentSel.length >= 5) {
-                  alert("Você pode selecionar até 5 números.");
-                  return;
-                }
-                currentSel.push(n);
-              }
-              const roomRef = doc(db, "salas", state.roomCode);
-              await updateDoc(roomRef, {
-                [`players.${state.slot}.selectedNumbers`]: currentSel
-              });
-            };
-          } else {
-            btn.disabled = true;
-          }
-
-          grid.appendChild(btn);
-          if (pickers.length > 0) {
-            const dots = document.createElement("div");
-            dots.className = "row";
-            dots.style.gap = "3px";
-            dots.style.justifyContent = "center";
-            dots.style.marginTop = "4px";
-            pickers.forEach((pk) => {
-              const dot = document.createElement("span");
-              dot.className = "color-dot";
-              dot.style.background = pk.color;
-              dot.title = pk.name;
-              dots.appendChild(dot);
-            });
-            btn.appendChild(dots);
-          }
-        }
-
-        gameInteractiveBox.appendChild(grid);
-
-        if (state.mode === "mobile" && state.slot) {
-          btnClearSelection.classList.remove("hidden");
-          btnClearSelection.onclick = async () => {
-            const roomRef = doc(db, "salas", state.roomCode);
-            await updateDoc(roomRef, {
-              [`players.${state.slot}.selectedNumbers`]: []
-            });
-          };
-        }
-      }
-
-      if (activeGameId === 4) {
-        gameInteractiveBox.classList.remove("hidden");
-        const comm = Array.isArray(data.communityCards) ? data.communityCards : [];
-        const commText = comm.length ? comm.join("  ") : "Aguardando distribuição da TV...";
-        let html = `<div><strong>Mesa Texas Hold'em (5 Comunitárias):</strong> ${commText}</div>`;
-        if (state.mode === "mobile" && state.slot) {
-          const myCards = data.privateHands?.[state.slot] || ["?", "?"];
-          html += `<div style="margin-top:8px; color:var(--neon);"><strong>Suas Cartas Privadas (Só no seu celular):</strong> ${myCards.join("  ")}</div>`;
-        } else {
-          html += `<div class="status-bar" style="margin-top:6px;">Cartas privadas ficam ocultas na TV e aparecem apenas no celular de cada participante.</div>`;
-        }
-        gameInteractiveBox.innerHTML = html;
-      }
-
-      if (activeGameId === 6) {
-        gameInteractiveBox.classList.remove("hidden");
-        const drawn = Array.isArray(data.bingoDrawn) ? data.bingoDrawn : [];
-
-        if (state.mode === "mobile" && state.slot) {
-          const savedName = me?.bingoName || me?.name || "";
-          const cardGrid = Array.isArray(me?.bingoCard) ? me.bingoCard : generateBingoCard();
-          gameInteractiveBox.innerHTML = `
-            <div class="row" style="margin-bottom:8px;">
-              <input id="bingoNameInput" type="text" maxlength="16" value="${savedName}" placeholder="Seu nome na cartela" />
-              <button id="btnSaveBingoName" type="button" class="outline">Salvar Cartela</button>
-            </div>
-            <div class="status-bar">Números sorteados pela TV: <strong>${drawn.length ? drawn.join(", ") : "Nenhum ainda"}</strong></div>
-          `;
-
-          const cardEl = document.createElement("div");
-          cardEl.className = "bingo-card";
-          cardGrid.forEach((row) => {
-            row.forEach((cellVal) => {
-              const cell = document.createElement("div");
-              const isMarked = cellVal === "FREE" || state.markedBingo.includes(cellVal);
-              cell.className = "bingo-cell" + (isMarked ? " marked" : "");
-              cell.textContent = String(cellVal);
-              cell.onclick = () => {
-                if (cellVal === "FREE") return;
-                const idx = state.markedBingo.indexOf(cellVal);
-                if (idx >= 0) state.markedBingo.splice(idx, 1);
-                else state.markedBingo.push(cellVal);
-                renderRoom();
-              };
-              cardEl.appendChild(cell);
-            });
-          });
-          gameInteractiveBox.appendChild(cardEl);
-
-          document.getElementById("btnSaveBingoName").onclick = async () => {
-            const bName = document.getElementById("bingoNameInput").value.trim() || me.name;
-            const roomRef = doc(db, "salas", state.roomCode);
-            await updateDoc(roomRef, {
-              [`players.${state.slot}.bingoName`]: bName,
-              [`players.${state.slot}.bingoCard`]: cardGrid
-            });
-          };
-
-          btnCallBingo.classList.remove("hidden");
-          btnCallBingo.onclick = async () => {
-            const roomRef = doc(db, "salas", state.roomCode);
-            await updateDoc(roomRef, {
-              [`players.${state.slot}.bingoClaimed`]: true,
-              display: `🎉 BINGO ANUNCIADO POR ${me?.bingoName || me?.name}!`,
-              sub: `Marcados no celular: ${state.markedBingo.join(", ") || "nenhum"} — TV deve verificar a cartela.`
-            });
-          };
-        } else {
-          const claims = [];
-          for (let s = 1; s <= 7; s++) {
-            if (players[s]?.bingoClaimed) {
-              claims.push(`${players[s].bingoName || players[s].name} (Vaga ${s})`);
-            }
-          }
-          gameInteractiveBox.innerHTML = `
-            <div><strong>Bolas Sorteadas (1 a 75 — sem repetição):</strong> ${drawn.length ? drawn.join(", ") : "Nenhuma"}</div>
-            <div style="margin-top:6px;"><strong>Verificação de Bingo:</strong> ${claims.length ? "Anunciou Bingo: " + claims.join(", ") : "Nenhum anúncio pendente."}</div>
-          `;
-        }
-      }
-    }
-
-    function renderRoom() {
-      const data = state.roomData;
-      if (!data) return;
-
-      const activeGameId = getActiveGameId(data);
-      const gameObj = GAMES.find((g) => g.id === activeGameId) || GAMES[0];
-      const players = data.players || createDefaultPlayers();
-
-      currentGameTitle.textContent = gameObj.name.toUpperCase();
-      arenaDisplay.textContent = data.display || "PRONTO PARA JOGAR!";
-      arenaSub.textContent = data.sub || "";
-
-      if (state.mode === "mobile" && state.slot) {
-        const me = players[state.slot];
-        const pts = typeof me?.points === "number" ? me.points : INITIAL_POINTS;
-        myBalanceBadge.textContent = `Saldo: ${pts} pts`;
-
-        const alreadyDrew = Array.isArray(me?.drawnGames) && me.drawnGames.includes(activeGameId);
-        const isBingo = activeGameId === 6;
-        const btnMobileDraw = document.getElementById("btnMobileDraw");
-        btnMobileDraw.disabled = isBingo || alreadyDrew;
-        btnMobileDraw.textContent = isBingo
-          ? "Bingo: somente a TV sorteia"
-          : (alreadyDrew ? "Sorteio já realizado neste jogo" : "🎲 Realizar Meu Sorteio (1x neste jogo)");
-      }
-
-      gamesMenu.innerHTML = "";
-      GAMES.forEach((g) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        const isSelected = activeGameId === g.id;
-        btn.className = "outline" + (isSelected ? " active" : "");
-        btn.textContent = g.name;
-        btn.onclick = async () => {
-          if (state.mode === "tv") {
-            const roomRef = doc(db, "salas", state.roomCode);
-            await updateDoc(roomRef, {
-              gameId: g.id,
-              gameName: g.name,
-              display: `${g.name.toUpperCase()} SELECIONADO`,
-              sub: "Rodada pronta na TV.",
-              updatedAt: Date.now()
-            });
-          } else {
-            state.chosenGameId = g.id;
-            state.enteredGame = true;
-            preGameCalcCard.classList.add("hidden");
-            renderRoom();
-          }
-        };
-        gamesMenu.appendChild(btn);
-      });
-
-      renderInteractiveGameBox(data, activeGameId);
-
-      playersBoard.innerHTML = "";
-      for (let i = 1; i <= 7; i++) {
-        const p = players[i] || { active: false, name: `Participante ${i}`, points: INITIAL_POINTS, color: PLAYER_COLORS[i], selectedNumbers: [] };
-        const box = document.createElement("div");
-        box.className = "player-box" + (p.active ? " occupied" : "");
-        const selText = Array.isArray(p.selectedNumbers) && p.selectedNumbers.length
-          ? `Números: ${p.selectedNumbers.join(", ")}`
-          : "Sem números selecionados";
-        box.innerHTML = `
-          <div class="player-slot">
-            <span class="color-dot" style="background:${p.color || PLAYER_COLORS[i]}"></span>
-            Vaga ${i} • ${p.active ? "ATIVO" : "LIVRE"}
-          </div>
-          <div class="player-name">${p.name}</div>
-          <div class="player-points">${p.points ?? INITIAL_POINTS} pts</div>
-          <div class="status-bar" style="margin-top:4px;">${selText}</div>
-        `;
-        playersBoard.appendChild(box);
-      }
-    }
-
-    document.getElementById("btnStartTV").onclick = () => {
-      const code = document.getElementById("tvRoomInput").value || "LARG" + Math.floor(10 + Math.random() * 89);
-      document.getElementById("tvRoomInput").value = code;
-      connectToRoom(code, "tv");
-    };
-
-    document.getElementById("btnJoinMobile").onclick = () => {
-      const code = document.getElementById("mobileRoomInput").value;
-      const slot = document.getElementById("slotSelect").value;
-      const name = document.getElementById("playerNameInput").value;
-      connectToRoom(code, "mobile", slot, name);
-    };
-
-    document.getElementById("btnEnterSelectedGame").onclick = () => {
-      state.enteredGame = true;
-      preGameCalcCard.classList.add("hidden");
-      renderRoom();
-    };
-
-    document.getElementById("btnLeaveRoom").onclick = () => {
-      if (state.unsubscribe) state.unsubscribe();
-      state.roomCode = null;
-      roomSection.classList.add("hidden");
-      lobbySection.classList.remove("hidden");
-    };
-
-    document.getElementById("btnTvDraw").onclick = async () => {
-      if (!state.roomData) return;
-      const gameId = state.roomData.gameId || 1;
-      const outcome = runGameDraw(gameId, state.roomData);
-      const roomRef = doc(db, "salas", state.roomCode);
-      const payload = {
-        display: outcome.display,
-        sub: outcome.sub,
-        updatedAt: Date.now()
-      };
-      if (outcome.bingoDrawn) payload.bingoDrawn = outcome.bingoDrawn;
-      if (outcome.communityCards) payload.communityCards = outcome.communityCards;
-      if (outcome.privateHands) payload.privateHands = outcome.privateHands;
-      await updateDoc(roomRef, payload);
-      arenaDisplay.classList.remove("spin-anim");
-      void arenaDisplay.offsetWidth;
-      arenaDisplay.classList.add("spin-anim");
-    };
-
-    document.getElementById("btnTvFinalBingo").onclick = async () => {
-      if (!state.roomData) return;
-      const roomRef = doc(db, "salas", state.roomCode);
-      await updateDoc(roomRef, {
-        gameId: 6,
-        gameName: "6. Bingo",
-        finalBingoRound: true,
-        display: "🏆 RODADA FINAL ESPECIAL DO BINGO!",
-        sub: "Somente a TV sorteia os números decisivos.",
-        updatedAt: Date.now()
-      });
-    };
-
-    document.getElementById("btnNewRoundReset").onclick = async () => {
-      if (!state.roomData) return;
-      const updated = { ...state.roomData.players };
-      for (let i = 1; i <= 7; i++) {
-        if (updated[i]) {
-          updated[i].drawnGames = [];
-          updated[i].selectedNumbers = [];
-          updated[i].bingoClaimed = false;
-        }
-      }
-      const roomRef = doc(db, "salas", state.roomCode);
-      await updateDoc(roomRef, {
-        players: updated,
-        bingoDrawn: [],
-        finalBingoRound: false,
-        display: "NOVA RODADA INICIADA!",
-        sub: "Sorteios liberados para nova rodada.",
-        updatedAt: Date.now()
-      });
-    };
-
-    document.getElementById("btnResetScores").onclick = async () => {
-      if (!state.roomData) return;
-      const updated = { ...state.roomData.players };
-      for (let i = 1; i <= 7; i++) {
-        if (updated[i]) {
-          updated[i].points = INITIAL_POINTS;
-          updated[i].drawnGames = [];
-          updated[i].selectedNumbers = [];
-          updated[i].bingoClaimed = false;
-        }
-      }
-      const roomRef = doc(db, "salas", state.roomCode);
-      await updateDoc(roomRef, {
-        players: updated,
-        bingoDrawn: [],
-        display: "PONTOS REINICIADOS (40 PTS)",
-        sub: "Cada participante voltou a 40 pontos fictícios."
-      });
-    };
-
-    document.getElementById("btnMobileDraw").onclick = async () => {
-      if (!state.roomData || !state.slot) return;
-      const gameId = getActiveGameId(state.roomData);
-      if (gameId === 6) {
-        alert("No Bingo, somente a TV pode sortear números.");
-        return;
-      }
-
-      const me = state.roomData.players?.[state.slot];
-      const drawnGames = Array.isArray(me?.drawnGames) ? [...me.drawnGames] : [];
-      if (drawnGames.includes(gameId)) {
-        alert("Você já realizou seu sorteio neste jogo.");
-        return;
-      }
-
-      drawnGames.push(gameId);
-      const outcome = runGameDraw(gameId, state.roomData);
-      const gameObj = GAMES.find((g) => g.id === gameId) || GAMES[0];
-      const roomRef = doc(db, "salas", state.roomCode);
-
-      const payload = {
-        [`players.${state.slot}.drawnGames`]: drawnGames,
-        gameId,
-        gameName: gameObj.name,
-        display: outcome.display,
-        sub: `${me?.name || "Participante " + state.slot} jogou ${gameObj.name}: ${outcome.sub}`,
-        updatedAt: Date.now()
-      };
-      if (outcome.communityCards) payload.communityCards = outcome.communityCards;
-      if (outcome.privateHands) payload.privateHands = outcome.privateHands;
-
-      await updateDoc(roomRef, payload);
-    };
-  </script>
-</body>
-</html>
+    </header>
+
+    <!-- MODO CELULAR -->
+    <div id="view-celular" class="view-section active">
+      <section class="card">
+        <div class="player-bar">
+          
